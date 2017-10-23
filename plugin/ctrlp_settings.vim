@@ -17,9 +17,9 @@ let g:ctrlp_follow_symlinks   = 0
 function! s:ctrlp_fallback() abort
     if executable('rg')
         if g:ctrlp_follow_symlinks == 0
-            return 'rg %s --color=never --hidden --files -g ""'
+            return 'rg %s --color=never --hidden --files'
         else
-            return 'rg %s --color=never --hidden --follow --files -g ""'
+            return 'rg %s --color=never --hidden --follow --files'
         endif
     elseif executable('ag')
         if g:ctrlp_follow_symlinks == 0
