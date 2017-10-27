@@ -12,23 +12,24 @@ let g:ctrlp_map               = ''
 let g:ctrlp_working_path_mode = 'w'
 let g:ctrlp_reuse_window      = 'startify'
 let g:ctrlp_prompt_mappings   = { 'MarkToOpen()': ['<C-z>', '<C-@>'], }
-let g:ctrlp_follow_symlinks   = 0
+
+let s:ctrlp_follow_symlinks   = 0
 
 function! s:ctrlp_fallback() abort
     if executable('rg')
-        if g:ctrlp_follow_symlinks == 0
+        if s:ctrlp_follow_symlinks == 0
             return 'rg %s --color=never --hidden --files'
         else
             return 'rg %s --color=never --hidden --follow --files'
         endif
     elseif executable('ag')
-        if g:ctrlp_follow_symlinks == 0
+        if s:ctrlp_follow_symlinks == 0
             return 'ag %s --nocolor --hidden -l -g ""'
         else
             return 'ag %s --nocolor --hidden --follow -l -g ""'
         endif
     elseif executable('pt')
-        if g:ctrlp_follow_symlinks == 0
+        if s:ctrlp_follow_symlinks == 0
             return 'pt %s --nocolor --hidden -l -g='
         else
             return 'pt %s --nocolor --hidden --follow -l -g='
@@ -36,7 +37,7 @@ function! s:ctrlp_fallback() abort
     elseif has('win32') || has('win64')
         return 'dir %s /-n /b /s /a-d'
     else
-        if g:ctrlp_follow_symlinks == 0
+        if s:ctrlp_follow_symlinks == 0
             return 'find %s -type f'
         else
             return 'find -L %s -type f'
@@ -44,8 +45,7 @@ function! s:ctrlp_fallback() abort
     endif
 endfunction
 
-let g:ctrlp_use_caching  = 0
-let g:ctrlp_user_command = {
+let s:ctrlp_user_command = {
             \ 'types': {
             \   1: ['.git', 'cd %s && git ls-files . --cached --others --exclude-standard'],
             \   2: ['.hg',  'hg --cwd %s locate -I .'],
@@ -53,16 +53,46 @@ let g:ctrlp_user_command = {
             \ 'fallback': s:ctrlp_fallback()
             \ }
 
-function! s:toggle_ctrlp_follow_symlinks() abort
-    if g:ctrlp_follow_symlinks == 0
-        let g:ctrlp_follow_symlinks = 1
-        echo 'CtrlP follows symlinks!'
+let g:ctrlp_use_caching  = 0
+let g:ctrlp_user_command = deepcopy(s:ctrlp_user_command)
+
+let s:ctrlp_use_vcs_command = 0
+
+function! s:toggle_ctrlp_user_command() abort
+    unlet g:ctrlp_user_command
+
+    if s:ctrlp_use_vcs_command == 0
+        let s:ctrlp_use_vcs_command = 1
+        let g:ctrlp_user_command = s:ctrlp_fallback()
+        echo 'CtrlP is using command `' . g:ctrlp_user_command . '`!'
     else
-        let g:ctrlp_follow_symlinks = 0
-        echo 'CtrlP does not symlinks!'
+        let s:ctrlp_use_vcs_command = 0
+        let g:ctrlp_user_command = deepcopy(s:ctrlp_user_command)
+        let g:ctrlp_user_command['fallback'] = s:ctrlp_fallback()
+        echo 'CtrlP is using command from VCS!'
+    endif
+endfunction
+
+command! -nargs=0 ToggleCtrlPUserCommand call <SID>toggle_ctrlp_user_command()
+
+function! s:toggle_ctrlp_follow_symlinks() abort
+    let msg = ''
+    if s:ctrlp_follow_symlinks == 0
+        let s:ctrlp_follow_symlinks = 1
+        let msg = 'CtrlP follows symlinks!'
+    else
+        let s:ctrlp_follow_symlinks = 0
+        let msg = 'CtrlP does not follow symlinks!'
     endif
 
-    let g:ctrlp_user_command['fallback'] = s:ctrlp_fallback()
+    if type(g:ctrlp_user_command) == type({})
+        let g:ctrlp_user_command['fallback'] = s:ctrlp_fallback()
+    else
+        let g:ctrlp_user_command = s:ctrlp_fallback()
+        let msg .= ' `' . g:ctrlp_user_command . '`'
+    endif
+
+    echo msg
 endfunction
 
 command! -nargs=0 ToggleCtrlPFollowSymlinks call <SID>toggle_ctrlp_follow_symlinks()
