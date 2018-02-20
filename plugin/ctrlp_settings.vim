@@ -96,7 +96,6 @@ function! s:toggle_ctrlp_follow_symlinks() abort
 endfunction
 
 command! -nargs=0 ToggleCtrlPFollowSymlinks call <SID>toggle_ctrlp_follow_symlinks()
-nnoremap <silent> =oA :ToggleCtrlPFollowSymlinks<CR>
-nnoremap <silent> coA :ToggleCtrlPFollowSymlinks<CR>
+nmap <silent> =oA :ToggleCtrlPFollowSymlinks<CR>
 
 let g:loaded_ctrlp_settings_vim = 1
