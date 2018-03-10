@@ -27,7 +27,7 @@ endfunction
 command! -nargs=0 ToggleCtrlPFollowSymlinks call <SID>toggle_ctrlp_follow_symlinks()
 nnoremap <silent> =oP :ToggleCtrlPFollowSymlinks<CR>
 
-function! s:detect_available_commands() abort
+function! s:detect_ctrlp_available_commands() abort
     let s:ctrlp_available_commands = ['autodetect']
     for cmd in ['rg', 'ag', 'pt', 'fd']
         if executable(cmd)
@@ -40,7 +40,7 @@ function! s:detect_available_commands() abort
     call add(s:ctrlp_available_commands, 'find')
 endfunction
 
-call s:detect_available_commands()
+call s:detect_ctrlp_available_commands()
 
 function! s:ctrlp_rg_command() abort
     let cmd = 'rg %s --color=never --no-ignore-vcs --hidden %s --files'
