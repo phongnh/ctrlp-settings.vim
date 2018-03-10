@@ -71,7 +71,9 @@ function! s:ctrlp_dir_command() abort
 endfunction
 
 function! s:ctrlp_find_command() abort
-    let ignores = '-path "*/.git/*" -o -path "*/.hg/*" -o -path "*/.svn/*" -o -path "*/gems/*" -o -path "*/.gems/*" -o -path "*/node_modules/*" -o -path "*.DS_Store"'
+    let ignores = '-path "*/.git/*" -o -path "*/.hg/*" -o -path "*/.svn/*"'
+    let ignores .= ' -o -path "*/gems/*" -o -path "*/.gems/*"'
+    let ignores .= ' -o -path "*/node_modules/*" -o -path "*/.built/*" -o -path "*.DS_Store"'
     let cmd = 'find %s %s ' . ignores . ' -prune -o -type f -print'
     let cmd = printf(cmd, s:ctrlp_follow_symlinks ? '-L' : '', '%s')
     return substitute(cmd, '  ', ' ', 'g')
