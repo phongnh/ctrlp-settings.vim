@@ -27,8 +27,10 @@ endfunction
 command! -nargs=0 ToggleCtrlPFollowSymlinks call <SID>toggle_ctrlp_follow_symlinks()
 nnoremap <silent> =oP :ToggleCtrlPFollowSymlinks<CR>
 
+let s:default_command = 'autodetect'
+
 function! s:detect_ctrlp_available_commands() abort
-    let s:ctrlp_available_commands = ['autodetect']
+    let s:ctrlp_available_commands = [s:default_command]
     for cmd in ['rg', 'ag', 'pt', 'fd']
         if executable(cmd)
             call add(s:ctrlp_available_commands, cmd)
@@ -112,7 +114,6 @@ endfunction
 let g:ctrlp_use_caching  = 0
 let g:ctrlp_user_command = s:ctrlp_autodetect_command()
 
-let s:default_command = 'autodetect'
 let s:ctrlp_current_command = s:default_command
 
 function! s:change_ctrlp_user_command(bang, command) abort
