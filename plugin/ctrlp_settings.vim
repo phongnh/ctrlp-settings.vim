@@ -115,19 +115,25 @@ let g:ctrlp_user_command = s:ctrlp_autodetect_command()
 let s:default_command = 'autodetect'
 let s:ctrlp_current_command = s:default_command
 
-function! s:change_ctrlp_user_command(command) abort
-    if index(s:ctrlp_available_commands, a:command) == -1
-        return
+function! s:change_ctrlp_user_command(bang, command) abort
+    if a:bang
+        let s:ctrlp_current_command = s:default_command
+    elseif strlen(a:command)
+        if index(s:ctrlp_available_commands, a:command) == -1
+            return
+        endif
+        let s:ctrlp_current_command = a:command
+    else
+        let idx = index(s:ctrlp_available_commands, s:ctrlp_current_command)
+        let s:ctrlp_current_command = get(s:ctrlp_available_commands, idx + 1, s:default_command)
     endif
 
-    let s:ctrlp_current_command = a:command
-
-    if a:command ==# s:default_command
+    if s:ctrlp_current_command ==# s:default_command
         let g:ctrlp_user_command = s:ctrlp_autodetect_command()
         echo 'CtrlP user command is autodetected!'
     else
-        let g:ctrlp_user_command = s:build_user_command(a:command)
-        if a:command ==# 'find'
+        let g:ctrlp_user_command = s:build_user_command(s:ctrlp_current_command)
+        if s:ctrlp_current_command ==# 'find'
             let msg = 'CtrlP is using `find %s %s -type f`!'
             let msg = printf(msg, s:ctrlp_follow_symlinks ? '-L' : '', '%s')
             echo substitute(msg, '  ', ' ', 'g')
@@ -137,24 +143,12 @@ function! s:change_ctrlp_user_command(command) abort
     endif
 endfunction
 
-function! s:list_available_commands(A, L, P) abort
+function! s:list_ctrlp_available_commands(A, L, P) abort
     return join(s:ctrlp_available_commands, "\n")
 endfunction
 
-command! -nargs=1 -complete=custom,<SID>list_available_commands ChangeCtrlPUserCommand call <SID>change_ctrlp_user_command(<q-args>)
+command! -nargs=? -bang -complete=custom,<SID>list_ctrlp_available_commands ChangeCtrlPUserCommand call <SID>change_ctrlp_user_command(<bang>0, <q-args>)
 
-function! s:cycle_ctrlp_user_command(bang) abort
-    if a:bang
-        let s:ctrlp_current_command = s:default_command
-    else
-        let idx = index(s:ctrlp_available_commands, s:ctrlp_current_command)
-        let s:ctrlp_current_command = get(s:ctrlp_available_commands, idx + 1, s:default_command)
-    endif
-    call s:change_ctrlp_user_command(s:ctrlp_current_command)
-endfunction
-
-command! -nargs=0 -bang CycleCtrlPUserCommand call <SID>cycle_ctrlp_user_command(<bang>0)
-
-nnoremap <silent> =op :CycleCtrlPUserCommand<CR>
+nnoremap <silent> =op :ChangeCtrlPUserCommand<CR>
 
 let g:loaded_ctrlp_settings_vim = 1
