@@ -31,7 +31,7 @@ let s:default_command = 'autodetect'
 
 function! s:detect_ctrlp_available_commands() abort
     let s:ctrlp_available_commands = [s:default_command]
-    for cmd in ['rg', 'ag', 'pt', 'fd']
+    for cmd in ['rg', 'ag', 'fd']
         if executable(cmd)
             call add(s:ctrlp_available_commands, cmd)
         endif
@@ -52,12 +52,6 @@ endfunction
 
 function! s:ctrlp_ag_command() abort
     let cmd = 'ag %s --nocolor --skip-vcs-ignores --hidden %s -l -g ""'
-    let cmd = printf(cmd, '%s', s:ctrlp_follow_symlinks ? '--follow' : '')
-    return substitute(cmd, '  ', ' ', 'g')
-endfunction
-
-function! s:ctrlp_pt_command() abort
-    let cmd = 'pt %s --nocolor --home-ptignore --skip-vcs-ignores --hidden %s -l -g='
     let cmd = printf(cmd, '%s', s:ctrlp_follow_symlinks ? '--follow' : '')
     return substitute(cmd, '  ', ' ', 'g')
 endfunction
@@ -100,8 +94,6 @@ function! s:build_user_command(command) abort
         return s:ctrlp_rg_command()
     elseif a:command ==# 'ag'
         return s:ctrlp_ag_command()
-    elseif a:command ==# 'pt'
-        return s:ctrlp_pt_command()
     elseif a:command ==# 'fd'
         return s:ctrlp_fd_command()
     elseif a:command ==# 'dir'
