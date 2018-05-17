@@ -3,6 +3,8 @@ if globpath(&rtp, 'plugin/ctrlp.vim') == ''
     finish
 endif
 
+let g:loaded_ctrlp_settings_vim = 0
+
 if get(g:, 'loaded_ctrlp_settings_vim', 0)
     finish
 endif
@@ -25,7 +27,7 @@ function! s:toggle_ctrlp_follow_symlinks() abort
 endfunction
 
 command! -nargs=0 ToggleCtrlPFollowSymlinks call <SID>toggle_ctrlp_follow_symlinks()
-nnoremap <silent> =oP :ToggleCtrlPFollowSymlinks<CR>
+nnoremap <silent> yoP :ToggleCtrlPFollowSymlinks<CR>
 
 let s:default_command = 'autodetect'
 
@@ -142,6 +144,6 @@ endfunction
 
 command! -nargs=? -bang -complete=custom,<SID>list_ctrlp_available_commands ChangeCtrlPUserCommand call <SID>change_ctrlp_user_command(<bang>0, <q-args>)
 
-nnoremap <silent> =op :ChangeCtrlPUserCommand<CR>
+nnoremap <silent> yop :ChangeCtrlPUserCommand<CR>
 
 let g:loaded_ctrlp_settings_vim = 1
