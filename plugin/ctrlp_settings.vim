@@ -38,10 +38,7 @@ endfunction
 
 function! s:detect_ctrlp_current_command() abort
     let idx = index(s:ctrlp_available_commands, g:ctrlp_find_tool)
-    if idx == -1
-        let idx = 0
-    endif
-    let s:ctrlp_current_command = get(s:ctrlp_available_commands, idx, s:default_command)
+    let s:ctrlp_current_command = get(s:ctrlp_available_commands, idx == -1 ? 0 : idx, s:default_command)
 endfunction
 
 function! s:ctrlp_rg_command() abort
@@ -62,9 +59,9 @@ endfunction
 
 function! s:ctrlp_fd_command() abort
     if s:ctrlp_follow_symlinks == 0
-        return 'fd --color=never --no-ignore-vcs --hidden --type file . %s'
+        return 'fd --color=never --no-ignore-vcs --ignore-file ~/.ignore --hidden --type file . %s'
     else
-        return 'fd --color=never --no-ignore-vcs --hidden --follow --type file . %s'
+        return 'fd --color=never --no-ignore-vcs --ignore-file ~/.ignore --hidden --follow --type file . %s'
     endif
 endfunction
 
