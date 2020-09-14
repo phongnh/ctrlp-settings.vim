@@ -19,32 +19,22 @@ let g:ctrlp_clear_cache_on_exit = 0
 let g:ctrlp_find_tool       = get(g:, 'ctrlp_find_tool', 'rg')
 let s:ctrlp_follow_symlinks = get(g:, 'ctrlp_follow_symlinks', 0)
 
-let s:find_cmd_ignores = '-path "*/.git/*" -o -path "*/.hg/*" -o -path "*/.svn/*"'
-let s:find_cmd_ignores .= ' -o -path "*/gems/*" -o -path "*/.gems/*"'
-let s:find_cmd_ignores .= ' -o -path "*/node_modules/*" -o -path "*/.built/*" -o -path "*.DS_Store"'
-
 let s:find_commands = {
-            \ 'rg':   'rg %s --color=never --no-ignore-vcs --ignore-dot --ignore-parent --hidden --files',
-            \ 'ag':   'ag %s --nocolor --skip-vcs-ignores --hidden -l -g ""',
-            \ 'fd':   'fd --color=never --no-ignore-vcs --ignore-file ~/.ignore --hidden --type file . %s',
-            \ 'dir':  'dir %s /-n /b /s /a-d',
-            \ 'find': 'find %s ' . s:find_cmd_ignores . ' -prune -o -type f -print',
+            \ 'rg': 'rg %s --color=never --no-ignore-vcs --ignore-dot --ignore-parent --hidden --files',
+            \ 'ag': 'ag %s --nocolor --skip-vcs-ignores --hidden -l -g ""',
+            \ 'fd': 'fd --color=never --no-ignore-vcs --ignore-file ~/.ignore --hidden --type file . %s',
             \ }
 
-let s:find_follows_commands = {
-            \ 'rg':   'rg %s --color=never --no-ignore-vcs --ignore-dot --ignore-parent --hidden --follow --files',
-            \ 'ag':   'ag %s --nocolor --skip-vcs-ignores --hidden --follow -l -g ""',
-            \ 'fd':   'fd --color=never --no-ignore-vcs --ignore-file ~/.ignore --hidden --follow --type file . %s',
-            \ 'dir':  'dir %s /-n /b /s /a-d',
-            \ 'find': 'find -L %s ' . s:find_cmd_ignores . ' -prune -o -type f -print',
+let s:find_with_follows_command = {
+            \ 'rg': 'rg %s --color=never --no-ignore-vcs --ignore-dot --ignore-parent --hidden --follow --files',
+            \ 'ag': 'ag %s --nocolor --skip-vcs-ignores --hidden --follow -l -g ""',
+            \ 'fd': 'fd --color=never --no-ignore-vcs --ignore-file ~/.ignore --hidden --follow --type file . %s',
             \ }
 
 let s:find_all_commands = {
-            \ 'rg':   'rg %s --color=never --no-ignore --hidden --files',
-            \ 'ag':   'ag %s --nocolor --unrestricted --hidden -l -g ""',
-            \ 'fd':   'fd --color=never --no-ignore --hidden --type file',
-            \ 'dir':  'dir %s /-n /b /s /a-d',
-            \ 'find': 'find %s ' . s:find_cmd_ignores . ' -prune -o -type f -print',
+            \ 'rg': 'rg %s --color=never --no-ignore --hidden --files',
+            \ 'ag': 'ag %s --nocolor --unrestricted --hidden -l -g ""',
+            \ 'fd': 'fd --color=never --no-ignore --hidden --type file',
             \ }
 
 let s:default_command = 'vcs'
@@ -56,10 +46,6 @@ function! s:detect_ctrlp_available_commands() abort
             call add(s:ctrlp_available_commands, cmd)
         endif
     endfor
-    if has('win64') || has('win32')
-        call add(s:ctrlp_available_commands, 'dir')
-    endif
-    call add(s:ctrlp_available_commands, 'find')
 endfunction
 
 function! s:detect_ctrlp_current_command() abort
@@ -68,10 +54,10 @@ function! s:detect_ctrlp_current_command() abort
 endfunction
 
 function! s:build_user_command(command) abort
-    if s:ctrlp_follow_symlinks == 0
-        return s:find_commands[a:command]
+    if s:ctrlp_follow_symlinks == 1
+        return s:find_with_follows_command[a:command]
     else
-        return s:find_follows_commands[a:command]
+        return s:find_commands[a:command]
     endif
 endfunction
 
