@@ -3,8 +3,6 @@ if globpath(&rtp, 'plugin/ctrlp.vim') == ''
     finish
 endif
 
-let g:loaded_ctrlp_settings_vim = 0
-
 if get(g:, 'loaded_ctrlp_settings_vim', 0)
     finish
 endif
@@ -20,6 +18,34 @@ let g:ctrlp_clear_cache_on_exit = 0
 
 let g:ctrlp_find_tool       = get(g:, 'ctrlp_find_tool', 'rg')
 let s:ctrlp_follow_symlinks = get(g:, 'ctrlp_follow_symlinks', 0)
+
+let s:find_cmd_ignores = '-path "*/.git/*" -o -path "*/.hg/*" -o -path "*/.svn/*"'
+let s:find_cmd_ignores .= ' -o -path "*/gems/*" -o -path "*/.gems/*"'
+let s:find_cmd_ignores .= ' -o -path "*/node_modules/*" -o -path "*/.built/*" -o -path "*.DS_Store"'
+
+let s:find_commands = {
+            \ 'rg':   'rg %s --color=never --no-ignore-vcs --ignore-dot --ignore-parent --hidden --files',
+            \ 'ag':   'ag %s --nocolor --skip-vcs-ignores --hidden -l -g ""',
+            \ 'fd':   'fd --color=never --no-ignore-vcs --ignore-file ~/.ignore --hidden --type file . %s',
+            \ 'dir':  'dir %s /-n /b /s /a-d',
+            \ 'find': 'find %s ' . s:find_cmd_ignores . ' -prune -o -type f -print',
+            \ }
+
+let s:find_follows_commands = {
+            \ 'rg':   'rg %s --color=never --no-ignore-vcs --ignore-dot --ignore-parent --hidden --follow --files',
+            \ 'ag':   'ag %s --nocolor --skip-vcs-ignores --hidden --follow -l -g ""',
+            \ 'fd':   'fd --color=never --no-ignore-vcs --ignore-file ~/.ignore --hidden --follow --type file . %s',
+            \ 'dir':  'dir %s /-n /b /s /a-d',
+            \ 'find': 'find -L %s ' . s:find_cmd_ignores . ' -prune -o -type f -print',
+            \ }
+
+let s:find_all_commands = {
+            \ 'rg':   'rg %s --color=never --no-ignore --hidden --files',
+            \ 'ag':   'ag %s --nocolor --unrestricted --hidden -l -g ""',
+            \ 'fd':   'fd --color=never --no-ignore --hidden --type file',
+            \ 'dir':  'dir %s /-n /b /s /a-d',
+            \ 'find': 'find %s ' . s:find_cmd_ignores . ' -prune -o -type f -print',
+            \ }
 
 let s:default_command = 'vcs'
 
@@ -41,62 +67,11 @@ function! s:detect_ctrlp_current_command() abort
     let s:ctrlp_current_command = get(s:ctrlp_available_commands, idx == -1 ? 0 : idx, s:default_command)
 endfunction
 
-function! s:ctrlp_rg_command() abort
-    if s:ctrlp_follow_symlinks == 0
-        return 'rg %s --color=never --no-ignore-vcs --hidden --files'
-    else
-        return 'rg %s --color=never --no-ignore-vcs --hidden --follow --files'
-    endif
-endfunction
-
-function! s:ctrlp_ag_command() abort
-    if s:ctrlp_follow_symlinks == 0
-        return 'ag %s --nocolor --skip-vcs-ignores --hidden -l -g ""'
-    else
-        return 'ag %s --nocolor --skip-vcs-ignores --hidden --follow -l -g ""'
-    endif
-endfunction
-
-function! s:ctrlp_fd_command() abort
-    if s:ctrlp_follow_symlinks == 0
-        return 'fd --color=never --no-ignore-vcs --ignore-file ~/.ignore --hidden --type file . %s'
-    else
-        return 'fd --color=never --no-ignore-vcs --ignore-file ~/.ignore --hidden --follow --type file . %s'
-    endif
-endfunction
-
-function! s:ctrlp_dir_command() abort
-    return 'dir %s /-n /b /s /a-d'
-endfunction
-
-let s:find_ignores = '-path "*/.git/*" -o -path "*/.hg/*" -o -path "*/.svn/*"'
-let s:find_ignores .= ' -o -path "*/gems/*" -o -path "*/.gems/*"'
-let s:find_ignores .= ' -o -path "*/node_modules/*" -o -path "*/.built/*" -o -path "*.DS_Store"'
-
-function! s:ctrlp_find_command(...) abort
-    let include_ignores = get(a:, 1, 1)
-    let ignores = ' '
-    if include_ignores
-        let ignores .= s:find_ignores . ' '
-    endif
-    if s:ctrlp_follow_symlinks == 0
-        return 'find %s' . ignores . '-prune -o -type f -print'
-    else
-        return 'find -L %s' . ignores . '-prune -o -type f -print'
-    endif
-endfunction
-
 function! s:build_user_command(command) abort
-    if a:command ==# 'rg'
-        return s:ctrlp_rg_command()
-    elseif a:command ==# 'ag'
-        return s:ctrlp_ag_command()
-    elseif a:command ==# 'fd'
-        return s:ctrlp_fd_command()
-    elseif a:command ==# 'dir'
-        return s:ctrlp_dir_command()
+    if s:ctrlp_follow_symlinks == 0
+        return s:find_commands[a:command]
     else
-        return s:ctrlp_find_command()
+        return s:find_follows_commands[a:command]
     endif
 endfunction
 
@@ -128,8 +103,6 @@ endfunction
 function! s:print_ctrlp_current_command_info() abort
     if s:ctrlp_current_command ==# s:default_command
         echo 'CtrlP is using VCS command (git/hg)!'
-    elseif s:ctrlp_current_command ==# 'find'
-        echo 'CtrlP is using command `' . s:ctrlp_find_command(0) . '`!'
     else
         echo 'CtrlP is using command `' . g:ctrlp_user_command . '`!'
     endif
