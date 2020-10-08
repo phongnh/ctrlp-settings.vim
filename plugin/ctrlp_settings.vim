@@ -16,6 +16,9 @@ let g:ctrlp_use_caching         = 0 " rg/ag is enough fast, we don't need cache
 let g:ctrlp_max_files           = 0
 let g:ctrlp_clear_cache_on_exit = 0
 
+" Only update the match window after typing's been stop for 250ms
+let g:ctrlp_lazy_update = 1
+
 let g:ctrlp_find_tool       = get(g:, 'ctrlp_find_tool', 'rg')
 let s:ctrlp_follow_symlinks = get(g:, 'ctrlp_follow_symlinks', 0)
 
