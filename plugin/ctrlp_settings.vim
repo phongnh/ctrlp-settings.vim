@@ -12,7 +12,7 @@ let g:ctrlp_working_path_mode = 'w'
 let g:ctrlp_reuse_window      = 'startify'
 let g:ctrlp_prompt_mappings   = { 'MarkToOpen()': ['<C-z>', '<C-@>'], }
 
-let g:ctrlp_use_caching         = 0 " rg/ag is enough fast, we don't need cache
+let g:ctrlp_use_caching         = 0 " rg is enough fast, we don't need cache
 let g:ctrlp_max_files           = 0
 let g:ctrlp_clear_cache_on_exit = 0
 
@@ -24,19 +24,16 @@ let s:ctrlp_follow_symlinks = get(g:, 'ctrlp_follow_symlinks', 0)
 
 let s:find_commands = {
             \ 'rg': 'rg %s --color=never --no-ignore-vcs --ignore-dot --ignore-parent --hidden --files',
-            \ 'ag': 'ag %s --nocolor --skip-vcs-ignores --path-to-ignore .agignore --hidden -l -g ""',
             \ 'fd': 'fd --color=never --no-ignore-vcs --hidden --type file . %s',
             \ }
 
 let s:find_with_follows_command = {
             \ 'rg': 'rg %s --color=never --no-ignore-vcs --ignore-dot --ignore-parent --hidden --follow --files',
-            \ 'ag': 'ag %s --nocolor --skip-vcs-ignores --path-to-ignore .agignore --hidden --follow -l -g ""',
             \ 'fd': 'fd --color=never --no-ignore-vcs --hidden --follow --type file . %s',
             \ }
 
 let s:find_all_commands = {
             \ 'rg': 'rg %s --color=never --no-ignore --hidden --files',
-            \ 'ag': 'ag %s --nocolor --unrestricted --hidden -l -g ""',
             \ 'fd': 'fd --color=never --no-ignore --hidden --type file',
             \ }
 
@@ -44,7 +41,7 @@ let s:default_command = 'vcs'
 
 function! s:detect_ctrlp_available_commands() abort
     let s:ctrlp_available_commands = [s:default_command]
-    for cmd in ['rg', 'ag', 'fd']
+    for cmd in ['rg', 'fd']
         if executable(cmd)
             call add(s:ctrlp_available_commands, cmd)
         endif
@@ -72,7 +69,7 @@ function! s:ctrlp_vcs_command() abort
                 \ },
                 \ }
 
-    " There is other command like rg, ag, fd, dir or find
+    " There is other command like rg, fd, dir or find
     if len(s:ctrlp_available_commands) > 1
         let user_command['fallback'] = s:build_user_command(s:ctrlp_available_commands[1])
     endif
