@@ -24,13 +24,13 @@ let s:ctrlp_follow_symlinks = get(g:, 'ctrlp_follow_symlinks', 0)
 
 let s:find_commands = {
             \ 'rg': 'rg %s --color=never --no-ignore-vcs --ignore-dot --ignore-parent --hidden --files',
-            \ 'ag': 'ag %s --nocolor --skip-vcs-ignores --hidden -l -g ""',
+            \ 'ag': 'ag %s --nocolor --skip-vcs-ignores --path-to-ignore .agignore --hidden -l -g ""',
             \ 'fd': 'fd --color=never --no-ignore-vcs --hidden --type file . %s',
             \ }
 
 let s:find_with_follows_command = {
             \ 'rg': 'rg %s --color=never --no-ignore-vcs --ignore-dot --ignore-parent --hidden --follow --files',
-            \ 'ag': 'ag %s --nocolor --skip-vcs-ignores --hidden --follow -l -g ""',
+            \ 'ag': 'ag %s --nocolor --skip-vcs-ignores --path-to-ignore .agignore --hidden --follow -l -g ""',
             \ 'fd': 'fd --color=never --no-ignore-vcs --hidden --follow --type file . %s',
             \ }
 
