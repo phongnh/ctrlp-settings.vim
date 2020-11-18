@@ -32,11 +32,6 @@ let s:find_with_follows_command = {
             \ 'fd': 'fd --color=never --no-ignore-vcs --hidden --follow --type file . %s',
             \ }
 
-let s:find_all_commands = {
-            \ 'rg': 'rg %s --color=never --no-ignore --hidden --files',
-            \ 'fd': 'fd --color=never --no-ignore --hidden --type file',
-            \ }
-
 let s:default_command = 'vcs'
 
 function! s:detect_ctrlp_available_commands() abort
