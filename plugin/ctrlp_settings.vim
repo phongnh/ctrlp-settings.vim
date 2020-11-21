@@ -15,6 +15,7 @@ let g:ctrlp_prompt_mappings   = { 'MarkToOpen()': ['<C-z>', '<C-@>'], }
 let g:ctrlp_use_caching         = 0 " rg is enough fast, we don't need cache
 let g:ctrlp_max_files           = 0
 let g:ctrlp_clear_cache_on_exit = 0
+let g:ctrlp_match_current_file  = get(g:, 'ctrlp_match_current_file', 1)
 
 " Only update the match window after typing's been stop for 250ms
 let g:ctrlp_lazy_update = 1
