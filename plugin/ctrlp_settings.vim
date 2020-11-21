@@ -41,7 +41,7 @@ let s:find_commands = {
             \ 'fd': 'fd --color=never --no-ignore-vcs --hidden --type file . %s',
             \ }
 
-let s:find_with_follows_command = {
+let s:find_with_follows_commands = {
             \ 'rg': 'rg %s --color=never --no-ignore-vcs --ignore-dot --ignore-parent --hidden --follow --files',
             \ 'fd': 'fd --color=never --no-ignore-vcs --hidden --follow --type file . %s',
             \ }
@@ -53,7 +53,7 @@ endfunction
 
 function! s:build_user_command(...) abort
     if s:ctrlp_follow_symlinks == 1
-        let l:user_command = s:find_with_follows_command[s:ctrlp_current_command]
+        let l:user_command = s:find_with_follows_commands[s:ctrlp_current_command]
     else
         let l:user_command = s:find_commands[s:ctrlp_current_command]
     endif
