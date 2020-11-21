@@ -20,8 +20,21 @@ let g:ctrlp_match_current_file  = get(g:, 'ctrlp_match_current_file', 1)
 " Only update the match window after typing's been stop for 250ms
 let g:ctrlp_lazy_update = 1
 
+let s:ctrlp_available_commands = filter(['rg', 'fd'], 'executable(v:val)')
+
+if empty(s:ctrlp_available_commands)
+    let g:ctrlp_user_command = {
+                \ 'types': {
+                \   1: ['.git', 'cd %s && git ls-files . --cached --others --exclude-standard'],
+                \   2: ['.hg',  'hg --cwd %s locate -I .'],
+                \ },
+                \ }
+    finish
+endif
+
 let g:ctrlp_find_tool       = get(g:, 'ctrlp_find_tool', 'rg')
-let s:ctrlp_follow_symlinks = get(g:, 'ctrlp_follow_symlinks', 0)
+let gctrlp_follow_symlinks  = get(g:, 'ctrlp_follow_symlinks', 0)
+let s:ctrlp_follow_symlinks = g:ctrlp_follow_symlinks
 
 let s:find_commands = {
             \ 'rg': 'rg %s --color=never --no-ignore-vcs --ignore-dot --ignore-parent --hidden --files',
@@ -33,88 +46,48 @@ let s:find_with_follows_command = {
             \ 'fd': 'fd --color=never --no-ignore-vcs --hidden --follow --type file . %s',
             \ }
 
-let s:default_command = 'vcs'
-
-function! s:detect_ctrlp_available_commands() abort
-    let s:ctrlp_available_commands = [s:default_command]
-    for cmd in ['rg', 'fd']
-        if executable(cmd)
-            call add(s:ctrlp_available_commands, cmd)
-        endif
-    endfor
-endfunction
-
 function! s:detect_ctrlp_current_command() abort
     let idx = index(s:ctrlp_available_commands, g:ctrlp_find_tool)
-    let s:ctrlp_current_command = get(s:ctrlp_available_commands, idx == -1 ? 0 : idx, s:default_command)
+    let s:ctrlp_current_command = get(s:ctrlp_available_commands, idx > -1 ? idx : 0)
 endfunction
 
-function! s:build_user_command(command) abort
+function! s:build_user_command(...) abort
     if s:ctrlp_follow_symlinks == 1
-        return s:find_with_follows_command[a:command]
+        let l:user_command = s:find_with_follows_command[s:ctrlp_current_command]
     else
-        return s:find_commands[a:command]
+        let l:user_command = s:find_commands[s:ctrlp_current_command]
     endif
-endfunction
-
-function! s:ctrlp_vcs_command() abort
-    let user_command = {
-                \ 'types': {
-                \   1: ['.git', 'cd %s && git ls-files . --cached --others --exclude-standard'],
-                \   2: ['.hg',  'hg --cwd %s locate -I .'],
-                \ },
-                \ }
-
-    " There is other command like rg, fd, dir or find
-    if len(s:ctrlp_available_commands) > 1
-        let user_command['fallback'] = s:build_user_command(s:ctrlp_available_commands[1])
-    endif
-
-    return user_command
-endfunction
-
-function! s:set_ctrlp_user_comand(command) abort
-    if a:command ==# s:default_command
-        let g:ctrlp_user_command = s:ctrlp_vcs_command()
-    else
-        let g:ctrlp_user_command = s:build_user_command(a:command)
-    endif
-    let s:ctrlp_current_command = a:command
+    let g:ctrlp_user_command = l:user_command
 endfunction
 
 function! s:print_ctrlp_current_command_info() abort
-    if s:ctrlp_current_command ==# s:default_command
-        echo 'CtrlP is using VCS command (git/hg)!'
-    else
-        echo 'CtrlP is using command `' . g:ctrlp_user_command . '`!'
-    endif
+    echo 'CtrlP is using command `' . g:ctrlp_user_command . '`!'
 endfunction
 
-command! -nargs=0 PrintCtrlPCurrentCommandInfo call <SID>print_ctrlp_current_command_info()
+command! PrintCtrlPCurrentCommandInfo call <SID>print_ctrlp_current_command_info()
 
 function! s:change_ctrlp_user_command(bang, command) abort
     " Reset to default command
     if a:bang
-        let new_command = s:default_command
+        call s:detect_ctrlp_current_command()
     elseif strlen(a:command)
         if index(s:ctrlp_available_commands, a:command) == -1
             return
         endif
-        let new_command = a:command
+        let s:ctrlp_current_command = a:command
     else
         let idx = index(s:ctrlp_available_commands, s:ctrlp_current_command)
-        let new_command = get(s:ctrlp_available_commands, idx + 1, s:default_command)
+        let s:ctrlp_current_command = get(s:ctrlp_available_commands, idx + 1, s:ctrlp_available_commands[0])
     endif
-
-    call s:set_ctrlp_user_comand(new_command)
+    call s:build_user_command()
     call s:print_ctrlp_current_command_info()
 endfunction
 
-function! s:list_ctrlp_available_commands(A, L, P) abort
-    return join(s:ctrlp_available_commands, "\n")
+function! s:list_ctrlp_available_commands(...) abort
+    return s:ctrlp_available_commands
 endfunction
 
-command! -nargs=? -bang -complete=custom,<SID>list_ctrlp_available_commands ChangeCtrlPUserCommand call <SID>change_ctrlp_user_command(<bang>0, <q-args>)
+command! -nargs=? -bang -complete=customlist,<SID>list_ctrlp_available_commands ChangeCtrlPUserCommand call <SID>change_ctrlp_user_command(<bang>0, <q-args>)
 
 function! s:toggle_ctrlp_follow_symlinks() abort
     if s:ctrlp_follow_symlinks == 0
@@ -124,13 +97,12 @@ function! s:toggle_ctrlp_follow_symlinks() abort
         let s:ctrlp_follow_symlinks = 0
         echo 'CtrlP does not follow symlinks!'
     endif
-    call s:set_ctrlp_user_comand(s:ctrlp_current_command)
+    call s:build_user_command()
 endfunction
 
-command! -nargs=0 ToggleCtrlPFollowSymlinks call <SID>toggle_ctrlp_follow_symlinks()
+command! ToggleCtrlPFollowSymlinks call <SID>toggle_ctrlp_follow_symlinks()
 
-call s:detect_ctrlp_available_commands()
 call s:detect_ctrlp_current_command()
-call s:set_ctrlp_user_comand(s:ctrlp_current_command)
+call s:build_user_command()
 
 let g:loaded_ctrlp_settings_vim = 1
