@@ -37,13 +37,8 @@ let gctrlp_follow_symlinks  = get(g:, 'ctrlp_follow_symlinks', 0)
 let s:ctrlp_follow_symlinks = g:ctrlp_follow_symlinks
 
 let s:find_commands = {
-            \ 'rg': 'rg %s --color=never --no-ignore-vcs --ignore-dot --ignore-parent --hidden --files',
-            \ 'fd': 'fd --color=never --no-ignore-vcs --hidden --type file . %s',
-            \ }
-
-let s:find_with_follows_commands = {
-            \ 'rg': 'rg %s --color=never --no-ignore-vcs --ignore-dot --ignore-parent --hidden --follow --files',
-            \ 'fd': 'fd --color=never --no-ignore-vcs --hidden --follow --type file . %s',
+            \ 'rg': 'rg %s --files --color never --no-ignore-vcs --ignore-dot --ignore-parent --hidden',
+            \ 'fd': 'fd . %s --type file --color never --no-ignore-vcs --hidden',
             \ }
 
 function! s:detect_ctrlp_current_command() abort
@@ -52,10 +47,9 @@ function! s:detect_ctrlp_current_command() abort
 endfunction
 
 function! s:build_user_command(...) abort
+    let l:user_command = s:find_commands[s:ctrlp_current_command]
     if s:ctrlp_follow_symlinks == 1
-        let l:user_command = s:find_with_follows_commands[s:ctrlp_current_command]
-    else
-        let l:user_command = s:find_commands[s:ctrlp_current_command]
+        let l:user_command .= ' --follow'
     endif
     let g:ctrlp_user_command = l:user_command
 endfunction
