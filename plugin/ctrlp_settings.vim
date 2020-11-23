@@ -41,17 +41,21 @@ let s:find_commands = {
             \ 'fd': 'fd . %s --type file --color never --no-ignore-vcs --hidden',
             \ }
 
+function! s:build_find_command() abort
+    let l:cmd = s:find_commands[s:ctrlp_current_command]
+    if s:ctrlp_follow_symlinks == 1
+        let l:cmd .= ' --follow'
+    endif
+    return l:cmd
+endfunction
+
 function! s:detect_ctrlp_current_command() abort
     let idx = index(s:ctrlp_available_commands, g:ctrlp_find_tool)
     let s:ctrlp_current_command = get(s:ctrlp_available_commands, idx > -1 ? idx : 0)
 endfunction
 
-function! s:build_user_command(...) abort
-    let l:user_command = s:find_commands[s:ctrlp_current_command]
-    if s:ctrlp_follow_symlinks == 1
-        let l:user_command .= ' --follow'
-    endif
-    let g:ctrlp_user_command = l:user_command
+function! s:build_user_command() abort
+    let g:ctrlp_user_command = s:build_find_command()
 endfunction
 
 function! s:print_ctrlp_current_command_info() abort
