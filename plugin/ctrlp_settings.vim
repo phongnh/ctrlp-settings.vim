@@ -38,7 +38,7 @@ let s:ctrlp_follow_symlinks = g:ctrlp_follow_symlinks
 
 let s:find_commands = {
             \ 'rg': 'rg %s --files --color never --no-ignore-vcs --ignore-dot --ignore-parent --hidden',
-            \ 'fd': 'fd . %s --type file --color never --no-ignore-vcs --hidden',
+            \ 'fd': 'fd --base-directory %s --type file --color never --no-ignore-vcs --hidden',
             \ }
 
 function! s:build_find_command() abort
