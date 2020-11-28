@@ -10,7 +10,10 @@ endif
 let g:ctrlp_match_window      = 'max:15,results:50'
 let g:ctrlp_working_path_mode = 'w'
 let g:ctrlp_reuse_window      = 'startify'
-let g:ctrlp_prompt_mappings   = { 'MarkToOpen()': ['<C-z>', '<C-@>'], }
+let g:ctrlp_prompt_mappings   = {
+            \ 'MarkToOpen()':   ['<C-z>', '<C-@>'],
+            \ 'PrtDeleteEnt()': ['<F7>',  '<C-q>'],
+            \ }
 
 let g:ctrlp_use_caching         = 0 " rg is enough fast, we don't need cache
 let g:ctrlp_max_files           = 0
