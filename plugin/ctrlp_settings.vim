@@ -36,7 +36,7 @@ if empty(s:ctrlp_available_commands)
 endif
 
 let g:ctrlp_find_tool       = get(g:, 'ctrlp_find_tool', 'rg')
-let gctrlp_follow_symlinks  = get(g:, 'ctrlp_follow_symlinks', 0)
+let g:ctrlp_follow_symlinks = get(g:, 'ctrlp_follow_symlinks', 0)
 let s:ctrlp_follow_symlinks = g:ctrlp_follow_symlinks
 
 let s:find_commands = {
