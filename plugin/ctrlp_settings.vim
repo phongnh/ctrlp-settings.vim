@@ -38,14 +38,24 @@ endif
 let g:ctrlp_find_tool       = get(g:, 'ctrlp_find_tool', 'rg')
 let g:ctrlp_follow_symlinks = get(g:, 'ctrlp_follow_symlinks', 0)
 let s:ctrlp_follow_symlinks = g:ctrlp_follow_symlinks
+let g:ctrlp_no_ignores       = get(g:, 'ctrlp_no_ignores', 0)
+let s:ctrlp_no_ignores       = g:ctrlp_no_ignores
 
 let s:find_commands = {
             \ 'rg': 'rg %s --files --color never --no-ignore-vcs --ignore-dot --ignore-parent --hidden',
             \ 'fd': 'fd --base-directory %s --type file --color never --no-ignore-vcs --hidden',
             \ }
 
+let s:find_all_commands = {
+            \ 'rg': 'rg %s --files --color never --no-ignore --hidden',
+            \ 'fd': 'fd --base-directory %s --type file --color never --no-ignore --hidden',
+            \ }
+
 function! s:build_find_command() abort
     let l:cmd = s:find_commands[s:ctrlp_current_command]
+    if s:ctrlp_no_ignores
+        let l:cmd = s:find_all_commands[s:ctrlp_current_command]
+    endif
     if s:ctrlp_follow_symlinks == 1
         let l:cmd .= ' --follow'
     endif
@@ -102,6 +112,19 @@ function! s:toggle_ctrlp_follow_symlinks() abort
 endfunction
 
 command! ToggleCtrlPFollowSymlinks call <SID>toggle_ctrlp_follow_symlinks()
+
+function! s:toggle_ctrlp_no_ignores() abort
+    if s:ctrlp_no_ignores == 0
+        let s:ctrlp_no_ignores = 1
+        echo 'CtrlP does not respect ignores!'
+    else
+        let s:ctrlp_no_ignores = 0
+        echo 'CtrlP respects ignore!'
+    endif
+    call s:build_user_command()
+endfunction
+
+command! ToggleCtrlPNoIgnores call <SID>toggle_ctrlp_no_ignores()
 
 call s:detect_ctrlp_current_command()
 call s:build_user_command()
