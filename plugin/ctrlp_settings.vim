@@ -32,6 +32,7 @@ if empty(s:ctrlp_available_commands)
                 \   2: ['.hg',  'hg --cwd %s locate -I .'],
                 \ },
                 \ }
+    command! -nargs=? -complete=dir CtrlPAll :CtrlP <args>
     finish
 endif
 
@@ -125,6 +126,20 @@ function! s:toggle_ctrlp_no_ignores() abort
 endfunction
 
 command! ToggleCtrlPNoIgnores call <SID>toggle_ctrlp_no_ignores()
+
+function! s:ctrlp_all(dir) abort
+    let current = s:ctrlp_no_ignores
+    try
+        let s:ctrlp_no_ignores = 1
+        call s:build_user_command()
+        execute 'CtrlP' a:dir
+    finally
+        let s:ctrlp_no_ignores = current
+        call s:build_user_command()
+    endtry
+endfunction
+
+command! -nargs=? -complete=dir CtrlPAll call <SID>ctrlp_all(<q-args>)
 
 call s:detect_ctrlp_current_command()
 call s:build_user_command()
