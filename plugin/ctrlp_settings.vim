@@ -9,7 +9,8 @@ endif
 
 let g:ctrlp_match_window      = 'max:15,results:50'
 let g:ctrlp_working_path_mode = 0
-let g:ctrlp_root_markers      = ['.git', '.hg', '.svn', '.bzr', '_darcs', '.hex', 'mix.exs', 'Gemfile']
+let g:ctrlp_file_root_markers = ['Gemfile', 'rebar.config', 'mix.exs', 'Cargo.toml', 'shard.yml', 'go.mod']
+let g:ctrlp_root_markers      = ['.git', '.hg', '.svn', '.bzr', '_darcs'] + g:ctrlp_file_root_markers
 let g:ctrlp_reuse_window      = 'startify'
 let g:ctrlp_prompt_mappings   = {
             \ 'MarkToOpen()':   ['<C-z>', '<C-@>'],
@@ -26,6 +27,9 @@ let g:ctrlp_match_current_file  = get(g:, 'ctrlp_match_current_file', 1)
 let g:ctrlp_lazy_update = 1
 
 let s:ctrlp_available_commands = filter(['rg', 'fd'], 'executable(v:val)')
+
+" Redefine CtrlPRoot with working path mode 'ra' instead of 'r'
+command! -bar CtrlPRoot call ctrlp#init('fil', { 'mode': 'ra' })
 
 if empty(s:ctrlp_available_commands)
     let g:ctrlp_user_command = {
