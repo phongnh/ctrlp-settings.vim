@@ -8,7 +8,7 @@ if get(g:, 'loaded_ctrlp_settings_vim', 0)
 endif
 
 let g:ctrlp_match_window      = 'max:15,results:50'
-let g:ctrlp_working_path_mode = 'w'
+let g:ctrlp_working_path_mode = 0
 let g:ctrlp_root_markers      = ['.git', '.hg', '.svn', '.bzr', '_darcs', '.hex', 'mix.exs', 'Gemfile']
 let g:ctrlp_reuse_window      = 'startify'
 let g:ctrlp_prompt_mappings   = {
