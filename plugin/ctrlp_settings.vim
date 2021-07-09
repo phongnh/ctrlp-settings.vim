@@ -92,10 +92,10 @@ if empty(s:ctrlp_available_commands)
 endif
 
 let g:ctrlp_find_tool       = get(g:, 'ctrlp_find_tool', 'rg')
-let g:ctrlp_follow_symlinks = get(g:, 'ctrlp_follow_symlinks', 0)
+let g:ctrlp_follow_symlinks = get(g:, 'ctrlp_follow_symlinks', get(g:, 'ctrlp_follow_links', 0))
 let s:ctrlp_follow_symlinks = g:ctrlp_follow_symlinks
-let g:ctrlp_no_ignores       = get(g:, 'ctrlp_no_ignores', 0)
-let s:ctrlp_no_ignores       = g:ctrlp_no_ignores
+let g:ctrlp_no_ignores      = get(g:, 'ctrlp_no_ignores', 0)
+let s:ctrlp_no_ignores      = g:ctrlp_no_ignores
 
 let s:find_commands = {
             \ 'rg': 'rg %s --files --color never --no-ignore-vcs --ignore-dot --ignore-parent --hidden',
@@ -123,7 +123,7 @@ function! s:detect_ctrlp_current_command() abort
     let s:ctrlp_current_command = get(s:ctrlp_available_commands, idx > -1 ? idx : 0)
 endfunction
 
-function! s:build_user_command() abort
+function! s:build_ctrlp_user_command() abort
     let g:ctrlp_user_command = s:build_find_command()
 endfunction
 
@@ -146,7 +146,7 @@ function! s:change_ctrlp_user_command(bang, command) abort
         let idx = index(s:ctrlp_available_commands, s:ctrlp_current_command)
         let s:ctrlp_current_command = get(s:ctrlp_available_commands, idx + 1, s:ctrlp_available_commands[0])
     endif
-    call s:build_user_command()
+    call s:build_ctrlp_user_command()
     call s:print_ctrlp_current_command_info()
 endfunction
 
@@ -164,7 +164,7 @@ function! s:toggle_ctrlp_follow_symlinks() abort
         let s:ctrlp_follow_symlinks = 0
         echo 'CtrlP does not follow symlinks!'
     endif
-    call s:build_user_command()
+    call s:build_ctrlp_user_command()
 endfunction
 
 command! ToggleCtrlPFollowSymlinks call <SID>toggle_ctrlp_follow_symlinks()
@@ -177,7 +177,7 @@ function! s:toggle_ctrlp_no_ignores() abort
         let s:ctrlp_no_ignores = 0
         echo 'CtrlP respects ignore!'
     endif
-    call s:build_user_command()
+    call s:build_ctrlp_user_command()
 endfunction
 
 command! ToggleCtrlPNoIgnores call <SID>toggle_ctrlp_no_ignores()
@@ -186,17 +186,17 @@ function! s:ctrlp_all(dir) abort
     let current = s:ctrlp_no_ignores
     try
         let s:ctrlp_no_ignores = 1
-        call s:build_user_command()
+        call s:build_ctrlp_user_command()
         execute 'CtrlP' a:dir
     finally
         let s:ctrlp_no_ignores = current
-        call s:build_user_command()
+        call s:build_ctrlp_user_command()
     endtry
 endfunction
 
 command! -nargs=? -complete=dir CtrlPAll call <SID>ctrlp_all(<q-args>)
 
 call s:detect_ctrlp_current_command()
-call s:build_user_command()
+call s:build_ctrlp_user_command()
 
 let g:loaded_ctrlp_settings_vim = 1
