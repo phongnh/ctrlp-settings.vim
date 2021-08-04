@@ -24,7 +24,7 @@ let g:ctrlp_clear_cache_on_exit = 0
 let g:ctrlp_match_current_file  = get(g:, 'ctrlp_match_current_file', 1)
 
 " Only update the match window after typing's been stop for 250ms
-let g:ctrlp_lazy_update = 1
+let g:ctrlp_lazy_update = get(g:, 'ctrlp_lazy_update', 1)
 
 let s:ctrlp_available_commands = filter(['rg', 'fd'], 'executable(v:val)')
 
@@ -80,13 +80,15 @@ endfunction
 
 command! -bar CtrlPSmartRoot execute 'CtrlP' s:find_project_dir(expand('%:p:h'))
 
-if empty(s:ctrlp_available_commands)
-    let g:ctrlp_user_command = {
+let s:ctrlp_user_command = {
                 \ 'types': {
                 \   1: ['.git', 'cd %s && git ls-files . --cached --others --exclude-standard'],
                 \   2: ['.hg',  'hg --cwd %s locate -I .'],
                 \ },
                 \ }
+
+if empty(s:ctrlp_available_commands)
+    let g:ctrlp_user_command = deepcopy(s:ctrlp_user_command)
     command! -nargs=? -complete=dir CtrlPAll :CtrlP <args>
     finish
 endif
@@ -127,8 +129,17 @@ function! s:build_ctrlp_user_command() abort
     let g:ctrlp_user_command = s:build_find_command()
 endfunction
 
+function! s:build_ctrlp_user_command_with_vcs() abort
+    let g:ctrlp_user_command = deepcopy(s:ctrlp_user_command)
+    let g:ctrlp_user_command['fallback'] = s:build_find_command()
+endfunction
+
 function! s:print_ctrlp_current_command_info() abort
-    echo 'CtrlP is using command `' . g:ctrlp_user_command . '`!'
+    if type(g:ctrlp_user_command) == type({})
+        echo 'CtrlP is using VCS with fallback command `' . g:ctrlp_user_command['fallback'] . '`!'
+    else
+        echo 'CtrlP is using command `' . g:ctrlp_user_command . '`!'
+    endif
 endfunction
 
 command! PrintCtrlPCurrentCommandInfo call <SID>print_ctrlp_current_command_info()
@@ -197,6 +208,11 @@ endfunction
 command! -nargs=? -complete=dir CtrlPAll call <SID>ctrlp_all(<q-args>)
 
 call s:detect_ctrlp_current_command()
-call s:build_ctrlp_user_command()
+
+if get(g:, 'ctrlp_use_vcs_tool', 1)
+    call s:build_ctrlp_user_command_with_vcs()
+else
+    call s:build_ctrlp_user_command()
+endif
 
 let g:loaded_ctrlp_settings_vim = 1
