@@ -24,7 +24,7 @@ let g:ctrlp_clear_cache_on_exit = 0
 let g:ctrlp_match_current_file  = get(g:, 'ctrlp_match_current_file', 1)
 
 " Only update the match window after typing's been stop for 250ms
-let g:ctrlp_lazy_update = get(g:, 'ctrlp_lazy_update', 1)
+let g:ctrlp_lazy_update = get(g:, 'ctrlp_lazy_update', 0)
 
 let s:ctrlp_available_commands = filter(['rg', 'fd'], 'executable(v:val)')
 
