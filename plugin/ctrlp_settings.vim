@@ -26,7 +26,7 @@ let g:ctrlp_match_current_file  = get(g:, 'ctrlp_match_current_file', 1)
 " Only update the match window after typing's been stop for 250ms
 let g:ctrlp_lazy_update = get(g:, 'ctrlp_lazy_update', 0)
 
-let s:ctrlp_available_commands = filter(['rg', 'fd'], 'executable(v:val)')
+let s:ctrlp_available_commands = filter(['fd', 'rg'], 'executable(v:val)')
 
 " Redefine CtrlPRoot with working path mode 'ra' instead of 'r'
 command! -bar CtrlPRoot call ctrlp#init('fil', { 'mode': 'ra' })
@@ -93,20 +93,20 @@ if empty(s:ctrlp_available_commands)
     finish
 endif
 
-let g:ctrlp_find_tool       = get(g:, 'ctrlp_find_tool', 'rg')
+let g:ctrlp_find_tool       = get(g:, 'ctrlp_find_tool', 'fd')
 let g:ctrlp_follow_symlinks = get(g:, 'ctrlp_follow_symlinks', get(g:, 'ctrlp_follow_links', 0))
 let s:ctrlp_follow_symlinks = g:ctrlp_follow_symlinks
 let g:ctrlp_no_ignores      = get(g:, 'ctrlp_no_ignores', 0)
 let s:ctrlp_no_ignores      = g:ctrlp_no_ignores
 
 let s:find_commands = {
-            \ 'rg': 'rg %s --files --color never --no-ignore-vcs --ignore-dot --ignore-parent --hidden',
             \ 'fd': 'fd --base-directory %s --type file --color never --no-ignore-vcs --hidden',
+            \ 'rg': 'rg %s --files --color never --no-ignore-vcs --ignore-dot --ignore-parent --hidden',
             \ }
 
 let s:find_all_commands = {
-            \ 'rg': 'rg %s --files --color never --no-ignore --hidden',
             \ 'fd': 'fd --base-directory %s --type file --color never --no-ignore --hidden',
+            \ 'rg': 'rg %s --files --color never --no-ignore --hidden',
             \ }
 
 function! s:build_find_command() abort
