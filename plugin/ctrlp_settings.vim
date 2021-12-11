@@ -96,8 +96,6 @@ endif
 let g:ctrlp_find_tool       = get(g:, 'ctrlp_find_tool', 'fd')
 let g:ctrlp_follow_symlinks = get(g:, 'ctrlp_follow_symlinks', get(g:, 'ctrlp_follow_links', 0))
 let s:ctrlp_follow_symlinks = g:ctrlp_follow_symlinks
-let g:ctrlp_no_ignores      = get(g:, 'ctrlp_no_ignores', 0)
-let s:ctrlp_no_ignores      = g:ctrlp_no_ignores
 
 let s:find_commands = {
             \ 'fd': 'fd --base-directory %s --type file --color never --no-ignore-vcs --hidden',
@@ -105,18 +103,20 @@ let s:find_commands = {
             \ }
 
 let s:find_all_commands = {
-            \ 'fd': 'fd --base-directory %s --type file --color never --no-ignore --hidden',
-            \ 'rg': 'rg %s --files --color never --no-ignore --hidden',
+            \ 'fd': 'fd --base-directory %s --type file --color never --no-ignore --hidden --follow',
+            \ 'rg': 'rg %s --files --color never --no-ignore --hidden --follow',
             \ }
 
 function! s:build_find_command() abort
     let l:cmd = s:find_commands[s:ctrlp_current_command]
-    if s:ctrlp_no_ignores
-        let l:cmd = s:find_all_commands[s:ctrlp_current_command]
-    endif
     if s:ctrlp_follow_symlinks == 1
         let l:cmd .= ' --follow'
     endif
+    return l:cmd
+endfunction
+
+function! s:build_find_all_command() abort
+    let l:cmd = s:find_all_commands[s:ctrlp_current_command]
     return l:cmd
 endfunction
 
@@ -180,27 +180,11 @@ endfunction
 
 command! ToggleCtrlPFollowSymlinks call <SID>toggle_ctrlp_follow_symlinks()
 
-function! s:toggle_ctrlp_no_ignores() abort
-    if s:ctrlp_no_ignores == 0
-        let s:ctrlp_no_ignores = 1
-        echo 'CtrlP does not respect ignores!'
-    else
-        let s:ctrlp_no_ignores = 0
-        echo 'CtrlP respects ignore!'
-    endif
-    call s:build_ctrlp_user_command()
-endfunction
-
-command! ToggleCtrlPNoIgnores call <SID>toggle_ctrlp_no_ignores()
-
 function! s:ctrlp_all(dir) abort
-    let current = s:ctrlp_no_ignores
     try
-        let s:ctrlp_no_ignores = 1
-        call s:build_ctrlp_user_command()
+        let g:ctrlp_user_command = s:build_find_all_command()
         execute 'CtrlP' a:dir
     finally
-        let s:ctrlp_no_ignores = current
         call s:build_ctrlp_user_command()
     endtry
 endfunction
