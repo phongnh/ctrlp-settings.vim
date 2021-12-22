@@ -49,12 +49,12 @@ let g:ctrlp_follow_symlinks = get(g:, 'ctrlp_follow_symlinks', get(g:, 'ctrlp_fo
 let s:ctrlp_follow_symlinks = g:ctrlp_follow_symlinks
 
 let s:find_commands = {
-            \ 'fd': 'fd --base-directory %s --type file --color never --no-ignore-vcs --hidden',
+            \ 'fd': 'fd --base-directory %s --type file --color never --no-ignore-vcs --hidden --strip-cwd-prefix',
             \ 'rg': 'rg %s --files --color never --no-ignore-vcs --ignore-dot --ignore-parent --hidden',
             \ }
 
 let s:find_all_commands = {
-            \ 'fd': 'fd --base-directory %s --type file --color never --no-ignore --hidden --follow',
+            \ 'fd': 'fd --base-directory %s --type file --color never --no-ignore --hidden --follow --strip-cwd-prefix',
             \ 'rg': 'rg %s --files --color never --no-ignore --hidden --follow',
             \ }
 
