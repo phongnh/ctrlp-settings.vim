@@ -5,6 +5,7 @@ let g:ctrlp_file_root_markers = [
             \ 'Cargo.toml',
             \ 'shard.yml',
             \ 'go.mod',
+            \ '.root',
             \ ]
 
 let g:ctrlp_root_markers = ['.git', '.hg', '.svn', '.bzr', '_darcs'] + g:ctrlp_file_root_markers
