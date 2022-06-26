@@ -15,7 +15,7 @@ let g:ctrlp_prompt_mappings   = {
             \ 'PrtDeleteEnt()': ['<F7>',  '<C-q>'],
             \ }
 
-let g:ctrlp_use_caching         = 0 " rg is enough fast, we don't need cache
+let g:ctrlp_use_caching         = 0 " rg/fd is enough fast, we don't need cache
 let g:ctrlp_max_files           = 0
 let g:ctrlp_max_depth           = 10
 let g:ctrlp_clear_cache_on_exit = 0
@@ -104,7 +104,7 @@ function! s:change_ctrlp_user_command(bang, command) abort
             return
         endif
         let s:ctrlp_current_command = a:command
-    else
+    elseif type(g:ctrlp_user_command) != type({})
         let idx = index(s:ctrlp_available_commands, s:ctrlp_current_command)
         let s:ctrlp_current_command = get(s:ctrlp_available_commands, idx + 1, s:ctrlp_available_commands[0])
     endif
