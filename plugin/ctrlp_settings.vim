@@ -15,7 +15,7 @@ let g:ctrlp_prompt_mappings   = {
             \ 'PrtDeleteEnt()': ['<F7>',  '<C-q>'],
             \ }
 
-let g:ctrlp_use_caching         = 0 " rg/fd is enough fast, we don't need cache
+let g:ctrlp_use_caching         = get(g:, 'ctrlp_use_caching', 0) " rg/fd is enough fast, we don't need cache
 let g:ctrlp_max_files           = 0
 let g:ctrlp_max_depth           = 10
 let g:ctrlp_clear_cache_on_exit = 0
