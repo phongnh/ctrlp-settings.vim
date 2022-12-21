@@ -11,8 +11,10 @@ let g:ctrlp_match_window      = 'max:12,results:50'
 let g:ctrlp_working_path_mode = 0
 let g:ctrlp_reuse_window      = 'nofile\|startify'
 let g:ctrlp_prompt_mappings   = {
-            \ 'MarkToOpen()':   ['<C-z>', '<C-@>'],
-            \ 'PrtDeleteEnt()': ['<F7>',  '<C-q>'],
+            \ 'MarkToOpen()':    ['<C-z>', '<C-@>'],
+            \ 'PrtClearCache()': ['<F5>', '<C-_>', '!'],
+            \ 'PrtDeleteEnt()':  ['<F7>', '<C-q>'],
+            \ 'YankLine()':      [],
             \ }
 
 let g:ctrlp_use_caching         = get(g:, 'ctrlp_use_caching', 0) " rg/fd is enough fast, we don't need cache
