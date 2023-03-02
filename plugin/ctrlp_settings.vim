@@ -7,16 +7,19 @@ if get(g:, 'loaded_ctrlp_settings_vim', 0)
     finish
 endif
 
-let g:ctrlp_match_window      = 'max:12,results:50'
-let g:ctrlp_working_path_mode = 0
-let g:ctrlp_reuse_window      = 'nofile\|startify'
 let g:ctrlp_prompt_mappings   = {
-            \ 'MarkToOpen()':    ['<C-z>', '<C-@>'],
-            \ 'PrtClearCache()': ['<F5>', '<C-_>', '!'],
-            \ 'PrtDeleteEnt()':  ['<F7>', '<C-q>'],
-            \ 'YankLine()':      [],
+            \ 'MarkToOpen()':        ['<C-z>', '<C-@>'],
+            \ 'PrtClearCache()':     ['<F5>', '<C-_>', '!'],
+            \ 'PrtDeleteEnt()':      ['<F7>', '<C-q>'],
+            \ 'ToggleMRURelative()': ['<F2>', '?'],
+            \ 'YankLine()':          [],
             \ }
 
+let g:ctrlp_match_window        = 'max:12,results:50'
+let g:ctrlp_working_path_mode   = 0
+let g:ctrlp_reuse_window        = 'nofile\|startify'
+let g:ctrlp_mruf_relative       = 1
+let g:ctrlp_tilde_homedir       = get(g:, 'ctrlp_tilde_homedir', 1)
 let g:ctrlp_use_caching         = get(g:, 'ctrlp_use_caching', 0) " rg/fd is enough fast, we don't need cache
 let g:ctrlp_max_files           = 0
 let g:ctrlp_max_depth           = 10
