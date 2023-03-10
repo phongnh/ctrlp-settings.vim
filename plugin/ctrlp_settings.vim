@@ -20,7 +20,6 @@ let g:ctrlp_working_path_mode   = 0
 let g:ctrlp_reuse_window        = 'nofile\|startify'
 let g:ctrlp_mruf_relative       = 1
 let g:ctrlp_mruf_exclude        = '.git/.*'
-let g:ctrlp_tilde_homedir       = get(g:, 'ctrlp_tilde_homedir', 1)
 let g:ctrlp_use_caching         = get(g:, 'ctrlp_use_caching', 0) " rg/fd is enough fast, we don't need cache
 let g:ctrlp_max_files           = 0
 let g:ctrlp_max_depth           = 10
