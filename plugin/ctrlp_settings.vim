@@ -18,7 +18,7 @@ let g:ctrlp_prompt_mappings   = {
 let g:ctrlp_match_window        = 'max:12,results:50'
 let g:ctrlp_working_path_mode   = 0
 let g:ctrlp_reuse_window        = 'nofile\|startify'
-let g:ctrlp_mruf_relative       = 1
+let g:ctrlp_mruf_relative       = 0
 let g:ctrlp_mruf_exclude        = '.git/.*'
 let g:ctrlp_use_caching         = get(g:, 'ctrlp_use_caching', 0) " rg/fd is enough fast, we don't need cache
 let g:ctrlp_max_files           = 0
@@ -30,6 +30,19 @@ let g:ctrlp_match_current_file  = get(g:, 'ctrlp_match_current_file', 1)
 let g:ctrlp_lazy_update = get(g:, 'ctrlp_lazy_update', 0)
 
 let s:ctrlp_available_commands = filter(['fd', 'rg'], 'executable(v:val)')
+
+
+function! s:CtrlPMRUCwdFiles(dir) abort
+    let current = g:ctrlp_mruf_relative
+    try
+        let g:ctrlp_mruf_relative = 1
+        call ctrlp#init('mru', { 'dir': a:dir })
+    finally
+        let g:ctrlp_mruf_relative = current
+    endtry
+endfunction
+
+command! -nargs=? -complete=dir CtrlPMRUCwdFiles call <SID>CtrlPMRUCwdFiles(<q-args>)
 
 " Redefine CtrlPRoot with working path mode 'ra' instead of 'r'
 command! -bar CtrlPRoot call ctrlp#init('fil', { 'mode': 'ra' })
