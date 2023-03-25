@@ -29,6 +29,11 @@ let g:ctrlp_match_current_file  = get(g:, 'ctrlp_match_current_file', 1)
 " Only update the match window after typing's been stop for 250ms
 let g:ctrlp_lazy_update = get(g:, 'ctrlp_lazy_update', 0)
 
+" BufferTag
+let g:ctrlp_buftag_types = {
+            \ 'crystal': '--language-force=crystal',
+            \ }
+
 let s:ctrlp_available_commands = filter(['fd', 'rg'], 'executable(v:val)')
 
 
