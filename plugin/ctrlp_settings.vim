@@ -71,7 +71,6 @@ endfunction
 
 " Redefine CtrlPRoot with working path mode 'ra' instead of 'r'
 command! -bar CtrlPRoot call ctrlp#init('fil', { 'mode': 'ra' })
-command! -bar CtrlPSmartRoot execute 'CtrlP' ctrlp_settings#find_project_dir(expand('%:p:h'))
 command! -nargs=? -complete=dir CtrlPAll call ctrlp_settings#ctrlp_all(<q-args>)
 command! -nargs=? -complete=dir CtrlPMRUCwdFiles call ctrlp_settings#mru_cwd_files(<q-args>)
 
