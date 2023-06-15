@@ -102,9 +102,14 @@ function! s:build_ctrlp_user_command()
     endif
 endfunction
 
+function! s:setup_ctrlp_settings() abort
+    call s:build_find_all_command()
+    call s:build_ctrlp_user_command()
+endfunction
+
 augroup CtrlPSettings
     autocmd!
-    autocmd VimEnter * call <SID>build_ctrlp_user_command()
+    autocmd VimEnter * call <SID>setup_ctrlp_settings()
 augroup END
 
 let g:loaded_ctrlp_settings_vim = 1
