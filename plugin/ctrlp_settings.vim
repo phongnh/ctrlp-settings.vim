@@ -61,9 +61,9 @@ function! s:build_find_all_command() abort
                 \ }
 
     if g:ctrlp_find_tool ==# 'rg' && executable('rg')
-        let g:ctrlp_find_all_command = find_commands['rg']
+        let g:ctrlp_find_all_command = find_all_commands['rg']
     else
-        let g:ctrlp_find_all_command = find_commands['fd']
+        let g:ctrlp_find_all_command = find_all_commands['fd']
     endif
 
     return g:ctrlp_find_all_command
