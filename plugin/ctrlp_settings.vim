@@ -9,9 +9,9 @@ endif
 
 let g:ctrlp_prompt_mappings   = {
             \ 'MarkToOpen()':        ['<C-z>', '<C-@>'],
-            \ 'PrtClearCache()':     ['<F5>', '<C-_>', '!'],
+            \ 'PrtClearCache()':     ['<F5>', '<C-_>', ';'],
             \ 'PrtDeleteEnt()':      ['<F7>', '<C-q>'],
-            \ 'ToggleMRURelative()': ['<F2>', '?'],
+            \ 'ToggleMRURelative()': ['<F2>', '`', '~'],
             \ 'YankLine()':          [],
             \ }
 
