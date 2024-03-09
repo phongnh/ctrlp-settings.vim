@@ -16,3 +16,14 @@ function! ctrlp_settings#mru_cwd_files(dir) abort
         let g:ctrlp_mruf_relative = current
     endtry
 endfunction
+
+function! ctrlp_settings#toogle_follow_symlinks() abort
+    if g:ctrlp_follow_symlinks == 0
+        let g:ctrlp_follow_symlinks = 1
+        echo 'CtrlP follows symlinks!'
+    else
+        let g:ctrlp_follow_symlinks = 0
+        echo 'CtrlP does not follow symlinks!'
+    endif
+    call ctrlp_settings#command#build_user_command()
+endfunction
