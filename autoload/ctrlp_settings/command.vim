@@ -1,5 +1,5 @@
 function! s:BuildUserCommand()
-    if g:ctrlp_find_ignore_vcs > 1
+    if get(g:, 'ctrlp_use_vcs_tool', 0)
         let g:ctrlp_user_command = {
                     \ 'types': {
                     \   1: ['.git', 'cd %s && git ls-files . --cached --others --exclude-standard'],
@@ -25,7 +25,7 @@ function! s:BuildFindCommand() abort
     endif
 
     let g:ctrlp_find_command .= (g:ctrlp_follow_symlinks ? ' --follow' : '')
-    let g:ctrlp_find_command .= (g:ctrlp_find_ignore_vcs ? ' --ignore-vcs' : ' --no-ignore-vcs')
+    let g:ctrlp_find_command .= (g:ctrlp_find_no_ignore_vcs ? ' --no-ignore-vcs' : '')
 
     return g:ctrlp_find_command
 endfunction
