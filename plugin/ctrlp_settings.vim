@@ -46,7 +46,7 @@ let g:ctrlp_buftag_types = {
             \ }
 
 let g:ctrlp_find_tool       = get(g:, 'ctrlp_find_tool', 'fd')
-let g:ctrlp_find_ignore_vcs  = get(g:, 'ctrlp_find_ignore_vcs', 1)
+let g:ctrlp_find_ignore_vcs = get(g:, 'ctrlp_find_ignore_vcs', 1)
 let g:ctrlp_follow_symlinks = get(g:, 'ctrlp_follow_symlinks', get(g:, 'ctrlp_follow_links', 0))
 
 call ctrlp_settings#command#init()
