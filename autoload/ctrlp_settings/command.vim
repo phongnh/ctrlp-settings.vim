@@ -24,8 +24,8 @@ function! s:BuildFindCommand() abort
         let g:ctrlp_find_command = find_commands['fd']
     endif
 
-    let g:ctrlp_find_command .= (g:ctrlp_find_ignore_vcs ? ' --ignore-vcs' : ' --no-ignore-vcs')
     let g:ctrlp_find_command .= (g:ctrlp_follow_symlinks ? ' --follow' : '')
+    let g:ctrlp_find_command .= (g:ctrlp_find_ignore_vcs ? ' --ignore-vcs' : ' --no-ignore-vcs')
 
     return g:ctrlp_find_command
 endfunction
