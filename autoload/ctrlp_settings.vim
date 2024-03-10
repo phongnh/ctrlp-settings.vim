@@ -25,5 +25,5 @@ function! ctrlp_settings#toogle_follow_symlinks() abort
         let g:ctrlp_follow_symlinks = 0
         echo 'CtrlP does not follow symlinks!'
     endif
-    call ctrlp_settings#command#build_user_command()
+    call ctrlp_settings#command#init()
 endfunction
