@@ -46,15 +46,17 @@ let g:ctrlp_buftag_types = {
             \ }
 
 let g:ctrlp_find_tool          = get(g:, 'ctrlp_find_tool', 'fd')
+let g:ctrlp_find_tool          = g:ctrlp_find_tool ==# 'rg' && executable('rg') ? 'rg' : 'fd'
 let g:ctrlp_find_no_ignore_vcs = get(g:, 'ctrlp_find_no_ignore_vcs', 0)
 let g:ctrlp_follow_symlinks    = get(g:, 'ctrlp_follow_symlinks', get(g:, 'ctrlp_follow_links', 1))
 
 call ctrlp_settings#command#init()
 
+command! ToggleCtrlPFollowSymlinks call ctrlp_settings#toggle_follow_symlinks()
+
 " Redefine CtrlPRoot with working path mode 'ra' instead of 'r'
 command! -bar CtrlPRoot call ctrlp#init('fil', { 'mode': 'ra' })
 command! -nargs=? -complete=dir CtrlPAll call ctrlp_settings#ctrlp_all(<q-args>)
 command! -nargs=? -complete=dir CtrlPMRUCwdFiles call ctrlp_settings#mru_cwd_files(<q-args>)
-command! ToggleCtrlPFollowSymlinks call ctrlp_settings#toggle_follow_symlinks()
 
 let g:loaded_ctrlp_settings_vim = 1

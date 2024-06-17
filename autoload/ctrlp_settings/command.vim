@@ -18,7 +18,7 @@ function! s:BuildFindCommand() abort
                 \ 'rg': 'rg %s --files --color never --ignore-dot --ignore-parent --hidden',
                 \ }
 
-    if g:ctrlp_find_tool ==# 'rg' && executable('rg')
+    if g:ctrlp_find_tool ==# 'rg'
         let g:ctrlp_find_command = find_commands['rg']
     else
         let g:ctrlp_find_command = find_commands['fd']
@@ -36,7 +36,7 @@ function! s:BuildFindAllCommand() abort
                 \ 'rg': 'rg %s --files --color never --no-ignore --exclude .git --hidden --follow',
                 \ }
 
-    if g:ctrlp_find_tool ==# 'rg' && executable('rg')
+    if g:ctrlp_find_tool ==# 'rg'
         let g:ctrlp_find_all_command = find_all_commands['rg']
     else
         let g:ctrlp_find_all_command = find_all_commands['fd']
