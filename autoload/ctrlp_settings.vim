@@ -56,7 +56,7 @@ function! ctrlp_settings#match(items, str, limit, mmode, ispath, crfile, regex) 
 
     if empty(a:str)
         call matchadd('CtrlPLinePre', '^>')
-        return copy(a:items)
+        return a:items[0:(a:limit)]
     endif
 
     let [l:items, l:list_of_char_positions, _] = matchfuzzypos(a:items, a:str, { 'limit': a:limit })
