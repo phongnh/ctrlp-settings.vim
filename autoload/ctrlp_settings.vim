@@ -67,17 +67,18 @@ function! ctrlp_settings#match(items, str, limit, mmode, ispath, crfile, regex) 
     " let g:_list_of_char_positions = l:list_of_char_positions
     " let g:_highlight_positions = s:HighlightPositions(l:items, l:list_of_char_positions)
 
-    call matchaddpos('CtrlPMatch', s:HighlightPositions(l:items, l:list_of_char_positions))
+    let l:line_prefix_len = s:GetLinePrefixLen(a:ispath)
+    call matchaddpos('CtrlPMatch', s:HighlightPositions(l:items, l:list_of_char_positions, l:line_prefix_len))
     call matchadd('CtrlPLinePre', '^>')
 
     return l:items
 endfunction
 
-function! s:GetLinePrefixLen() abort
+function! s:GetLinePrefixLen(ispath) abort
     let l:len = len(get(g:, 'ctrlp_line_prefix', '> '))
-    if get(g:, 'ctrlp_devicons_len', 0)
+    if a:ispath && get(g:, 'ctrlp_devicons_len', 0)
         let l:len += g:ctrlp_devicons_len
-    elseif exists('g:ctrlp_formatline_func') && match(g:ctrlp_formatline_func, 'nerdfont#find\|WebDevIconsGetFileTypeSymbol') > -1
+    elseif a:ispath && exists('g:ctrlp_formatline_func') && match(g:ctrlp_formatline_func, 'nerdfont#find\|WebDevIconsGetFileTypeSymbol') > -1
         " DevIcons (4) and Space (1)
         let l:len += 4 + 1
     endif
@@ -113,10 +114,9 @@ function! s:ConvertCharPositions(char_positions) abort
     return l:result
 endfunction
 
-function! s:HighlightPositions(items, list_of_char_positions) abort
+function! s:HighlightPositions(items, list_of_char_positions, line_prefix_len) abort
     let l:result = []
     let l:total_items = len(a:items)
-    let l:line_prefix_len = s:GetLinePrefixLen()
     for [l:idx, l:char_positions] in items(a:list_of_char_positions)
         let l:item = a:items[l:idx]
         " TODO: Check CtrlP's position is bottom/top and its order is btt/ttb,
@@ -126,9 +126,9 @@ function! s:HighlightPositions(items, list_of_char_positions) abort
             let l:byteidx = byteidx(l:item, l:position[0]) + 1
             if len(l:position) == 2
                 let l:bytecount = byteidx(l:item, l:position[0] + l:position[1]) + 1 - l:byteidx
-                call add(l:result, [l:linenr, l:line_prefix_len + l:byteidx, l:bytecount])
+                call add(l:result, [l:linenr, a:line_prefix_len + l:byteidx, l:bytecount])
             else
-                call add(l:result, [l:linenr, l:line_prefix_len + l:byteidx])
+                call add(l:result, [l:linenr, a:line_prefix_len + l:byteidx])
             end
         endfor
     endfor
