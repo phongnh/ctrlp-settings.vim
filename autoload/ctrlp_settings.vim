@@ -61,19 +61,76 @@ function! ctrlp_settings#match(items, str, limit, mmode, ispath, crfile, regex) 
 
     let [l:items, l:list_of_char_positions, _] = matchfuzzypos(a:items, a:str, { 'limit': a:limit })
 
-    let l:size = len(l:list_of_char_positions)
-    let l:prefix_len = len(get(g:, 'ctrlp_line_prefix', '> '))
-    " TODO: Check CtrlP's position is bottom/top and its order is btt/ttb,
-    "       to calculate number to highlight
-    let l:positions = l:list_of_char_positions->mapnew(
-                \ {idx, char_positions -> char_positions->mapnew(
-                \   {_, pos -> [l:size - idx, pos + 1 + l:prefix_len]})}
-                \ )
-    for l:pos in l:positions
-        call matchaddpos('CtrlPMatch', l:pos)
-    endfor
+    " let g:_raw_items = copy(l:items)
+    " let g:_items = l:items
+    " let g:_detailed_items = l:items->mapnew({idx, item -> [item, l:list_of_char_positions[idx], s:ConvertCharPositions(l:list_of_char_positions[idx])]})
+    " let g:_list_of_char_positions = l:list_of_char_positions
+    " let g:_highlight_positions = s:HighlightPositions(l:items, l:list_of_char_positions)
 
+    call matchaddpos('CtrlPMatch', s:HighlightPositions(l:items, l:list_of_char_positions))
     call matchadd('CtrlPLinePre', '^>')
 
     return l:items
+endfunction
+
+function! s:GetLinePrefixLen() abort
+    let l:len = len(get(g:, 'ctrlp_line_prefix', '> '))
+    if get(g:, 'ctrlp_devicons_len', 0)
+        let l:len += g:ctrlp_devicons_len
+    elseif exists('g:ctrlp_formatline_func') && match(g:ctrlp_formatline_func, 'nerdfont#find\|WebDevIconsGetFileTypeSymbol') > -1
+        " DevIcons (4) and Space (1)
+        let l:len += 4 + 1
+    endif
+    return l:len
+endfunction
+
+function! s:ConvertCharPositions(char_positions) abort
+    let l:result = []
+    let l:start = a:char_positions[0]
+    let l:end = l:start
+    let l:len = 1
+    for l:idx in range(1, len(a:char_positions) - 1)
+        let l:pos = a:char_positions[l:idx]
+        if l:pos == (l:end + 1)
+            let l:len += 1
+        else
+            if l:len > 1
+                call add(l:result, [l:start, l:len])
+            else
+                call add(l:result, [l:start])
+            endif
+            let l:start = l:pos
+            let l:end = l:start
+            let l:len = 1
+        endif
+        let l:end = l:pos
+    endfor
+    if l:len > 1
+        call add(l:result, [l:start, l:len])
+    else
+        call add(l:result, [l:start])
+    endif
+    return l:result
+endfunction
+
+function! s:HighlightPositions(items, list_of_char_positions) abort
+    let l:result = []
+    let l:total_items = len(a:items)
+    let l:line_prefix_len = s:GetLinePrefixLen()
+    for [l:idx, l:char_positions] in items(a:list_of_char_positions)
+        let l:item = a:items[l:idx]
+        " TODO: Check CtrlP's position is bottom/top and its order is btt/ttb,
+        "       to calculate number to highlight
+        let l:linenr = l:total_items - (l:idx + 1) + 1
+        for l:position in s:ConvertCharPositions(l:char_positions)
+            let l:byteidx = byteidx(l:item, l:position[0]) + 1
+            if len(l:position) == 2
+                let l:bytecount = byteidx(l:item, l:position[0] + l:position[1]) + 1 - l:byteidx
+                call add(l:result, [l:linenr, l:line_prefix_len + l:byteidx, l:bytecount])
+            else
+                call add(l:result, [l:linenr, l:line_prefix_len + l:byteidx])
+            end
+        endfor
+    endfor
+    return l:result
 endfunction
