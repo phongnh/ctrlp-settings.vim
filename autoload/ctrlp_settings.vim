@@ -17,7 +17,7 @@ function! ctrlp_settings#mru_cwd_files(dir) abort
     endtry
 endfunction
 
-function! ctrlp_settings#toogle_follow_symlinks() abort
+function! ctrlp_settings#toggle_follow_symlinks() abort
     if g:ctrlp_follow_symlinks == 0
         let g:ctrlp_follow_symlinks = 1
         echo 'CtrlP follows symlinks!'
