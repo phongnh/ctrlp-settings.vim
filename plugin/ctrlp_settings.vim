@@ -46,7 +46,6 @@ let g:ctrlp_buftag_types = {
             \ }
 
 let g:ctrlp_find_tool          = get(g:, 'ctrlp_find_tool', 'fd')
-let g:ctrlp_find_tool          = g:ctrlp_find_tool ==# 'rg' && executable('rg') ? 'rg' : 'fd'
 let g:ctrlp_find_no_ignore_vcs = get(g:, 'ctrlp_find_no_ignore_vcs', 0)
 let g:ctrlp_follow_symlinks    = get(g:, 'ctrlp_follow_symlinks', get(g:, 'ctrlp_follow_links', 1))
 
