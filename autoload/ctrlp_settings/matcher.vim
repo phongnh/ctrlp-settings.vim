@@ -48,7 +48,7 @@ function! ctrlp_settings#matcher#match(items, str, limit, mmode, ispath, crfile,
     if ctrlp#call('s:curtype') ==# 'buf'
         let s:timer = timer_start(
                     \ 10,
-                    \ {t -> [clearmatches(), matchadd('CtrlPMatch', s:Esc(a:str)), hlexists('CtrlPLinePre') ? matchadd('CtrlPLinePre', '^>') : '', execute('redraw')]},
+                    \ {t -> [clearmatches(), s:HighlightDefault(a:str), hlexists('CtrlPLinePre') ? matchadd('CtrlPLinePre', '^>') : '', execute('redraw')]},
                     \ { 'repeat': 0 }
                     \ )
         return matchfuzzy(a:items, a:str, { 'limit': a:limit })
