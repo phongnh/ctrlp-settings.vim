@@ -21,36 +21,60 @@
 " |             results when a:ispath == 1.
 " |
 " +- a:regex  : In regex mode: 1 or 0.
+let s:timer = 0
+
 function! ctrlp_settings#matcher#match(items, str, limit, mmode, ispath, crfile, regex) abort
-    call clearmatches()
     " let g:_input_items = a:items
+    " let g:_limit = a:limit
     " let g:_ispath = a:ispath
     " let g:_mmode = a:mmode
 
     if empty(a:str)
-        call matchadd('CtrlPLinePre', '^>')
-        return a:items[0:(a:limit)]
+        call clearmatches()
+        return a:items[:(a:limit)]
     endif
 
+    call timer_stop(s:timer)
+
+    if a:regex
+        let s:timer = timer_start(
+                    \ 10,
+                    \ {t -> [clearmatches(), matchadd('CtrlPMatch', a:str), hlexists('CtrlPLinePre') ? matchadd('CtrlPLinePre', '^>') : '', execute('redraw')]},
+                    \ { 'repeat': 0 }
+                    \ )
+        return filter(copy(a:items), 'v:val =~ a:str')
+    endif
+
+    if ctrlp#call('s:curtype') ==# 'buf'
+        let s:timer = timer_start(
+                    \ 10,
+                    \ {t -> [clearmatches(), matchadd('CtrlPMatch', s:Esc(a:str)), hlexists('CtrlPLinePre') ? matchadd('CtrlPLinePre', '^>') : '', execute('redraw')]},
+                    \ { 'repeat': 0 }
+                    \ )
+        return matchfuzzy(a:items, a:str, { 'limit': a:limit })
+    endif
+
+    let l:line_prefix_len = s:GetLinePrefixLen(a:ispath)
     let [l:items, l:list_of_char_positions, _] = matchfuzzypos(a:items, a:str, { 'limit': a:limit })
 
-    " let g:_curtupe = ctrlp#call('s:curtype')
+    " let g:_curtype = ctrlp#call('s:curtype')
     " let g:_raw_items = copy(l:items)
     " let g:_items = l:items
     " let g:_detailed_items = l:items->mapnew({idx, item -> [item, l:list_of_char_positions[idx], s:ConvertCharPositions(l:list_of_char_positions[idx])]})
     " let g:_list_of_char_positions = l:list_of_char_positions
+    " let g:_highlight_positions = s:HighlightPositions(l:items, l:list_of_char_positions, l:line_prefix_len)
 
-    if ctrlp#call('s:curtype') ==# 'buf'
-        call s:HighlightDefault(a:str)
-    else
-        let l:line_prefix_len = s:GetLinePrefixLen(a:ispath)
-        " let g:_highlight_positions = s:HighlightPositions(l:items, l:list_of_char_positions, l:line_prefix_len)
-        call matchaddpos('CtrlPMatch', s:HighlightPositions(l:items, l:list_of_char_positions, l:line_prefix_len))
-    endif
-
-    call matchadd('CtrlPLinePre', '^>')
+    let s:timer = timer_start(
+                \ 10,
+                \ {t -> [clearmatches(), s:HighlightPositions(l:items, l:list_of_char_positions, l:line_prefix_len), hlexists('CtrlPLinePre') ? matchadd('CtrlPLinePre', '^>') : '', execute('redraw')]},
+                \ { 'repeat': 0 }
+                \ )
 
     return l:items
+endfunction
+
+function s:Esc(str) abort
+    return '\c' . substitute(tolower(a:str), '.', '\0[^\0]\\{-}', 'g')
 endfunction
 
 function! s:GetLinePrefixLen(ispath) abort
@@ -112,7 +136,7 @@ function! s:HighlightPositions(items, list_of_char_positions, line_prefix_len) a
             end
         endfor
     endfor
-    return l:result
+    call matchaddpos('CtrlPMatch', l:result)
 endfunction
 
 " Copied and modified from https://github.com/ctrlpvim/ctrlp.vim/blob/7c972cb19c8544c681ca345c64ec39e04f4651cc/autoload/ctrlp.vim#L2597
