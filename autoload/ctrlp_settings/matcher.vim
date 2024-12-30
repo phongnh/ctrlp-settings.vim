@@ -121,7 +121,8 @@ endfunction
 function! s:HighlightPositions(items, list_of_char_positions, line_prefix_len) abort
     let l:result = []
     let l:total_items = len(a:items)
-    for [l:idx, l:char_positions] in items(a:list_of_char_positions)
+    for l:idx in range(len(a:list_of_char_positions))
+        let l:char_positions = a:list_of_char_positions[l:idx]
         let l:item = a:items[l:idx]
         " TODO: Check CtrlP's position is bottom/top and its order is btt/ttb,
         "       to calculate line number to highlight
