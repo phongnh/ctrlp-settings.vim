@@ -1,38 +1,37 @@
 function! s:BuildUserCommand()
-    if get(g:, 'ctrlp_use_vcs_tool', 0)
-        let g:ctrlp_user_command = {
-                    \ 'types': {
-                    \   1: ['.git', 'cd %s && git ls-files . --cached --others --exclude-standard'],
-                    \   2: ['.hg',  'hg --cwd %s locate -I .'],
-                    \ },
-                    \ 'fallback': s:BuildFindCommand(),
-                    \ }
+    if exists('g:ctrlp_find_command')
+        if get(g:, 'ctrlp_use_vcs_tool', 0)
+            let g:ctrlp_user_command = ['.git', 'cd %s && git ls-files --cached --others --exclude-standard', g:ctrlp_find_command]
+        else
+            let g:ctrlp_user_command = g:ctrlp_find_command
+        endif
     else
-        let g:ctrlp_user_command = s:BuildFindCommand()
+        let g:ctrlp_user_command = ['.git', 'cd %s && git ls-files --cached --others --exclude-standard']
     endif
 endfunction
 
 function! s:BuildFindCommand() abort
-    let l:find_commands = {
-                \ 'fd': 'fd --base-directory %s --type file --color never --hidden',
-                \ 'rg': 'rg %s --files --color never --ignore-dot --ignore-parent --hidden',
-                \ }
-    let g:ctrlp_find_command = l:find_commands[g:ctrlp_find_tool ==# 'rg' ? 'rg' : 'fd']
-    let g:ctrlp_find_command .= (g:ctrlp_follow_symlinks ? ' --follow' : '')
-    let g:ctrlp_find_command .= (g:ctrlp_find_no_ignore_vcs ? ' --no-ignore-vcs' : '')
-    return g:ctrlp_find_command
+    if executable('fd')
+        let g:ctrlp_find_command = 'fd --base-directory %s --type file --color never --hidden'
+        let g:ctrlp_find_command .= (g:ctrlp_follow_symlinks ? ' --follow' : '')
+        let g:ctrlp_find_command .= (g:ctrlp_find_no_ignore_vcs ? ' --no-ignore-vcs' : '')
+    elseif executable('rg')
+        let g:ctrlp_find_command = 'rg %s --files --color never --ignore-dot --ignore-parent --hidden'
+        let g:ctrlp_find_command .= (g:ctrlp_follow_symlinks ? ' --follow' : '')
+        let g:ctrlp_find_command .= (g:ctrlp_find_no_ignore_vcs ? ' --no-ignore-vcs' : '')
+    endif
 endfunction
 
 function! s:BuildFindAllCommand() abort
-    let l:find_all_commands = {
-                \ 'fd': 'fd --base-directory %s --type file --color never --no-ignore --exclude .git --hidden --follow',
-                \ 'rg': 'rg %s --files --color never --no-ignore --exclude .git --hidden --follow',
-                \ }
-    let g:ctrlp_find_all_command = l:find_all_commands[g:ctrlp_find_tool ==# 'rg' ? 'rg' : 'fd']
-    return g:ctrlp_find_all_command
+    if executable('fd')
+        let g:ctrlp_find_all_command = 'fd --base-directory %s --type file --color never --no-ignore --exclude .git --hidden --follow'
+    elseif executable('rg')
+        let g:ctrlp_find_all_command = 'rg %s --files --color never --no-ignore --exclude .git --hidden --follow'
+    endif
 endfunction
 
 function! ctrlp_settings#command#init() abort
+    call s:BuildFindCommand()
     call s:BuildFindAllCommand()
     call s:BuildUserCommand()
 endfunction
