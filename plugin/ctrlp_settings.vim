@@ -3,7 +3,7 @@ if globpath(&rtp, 'plugin/ctrlp.vim') == ''
     finish
 endif
 
-if get(g:, 'loaded_ctrlp_settings_vim', 0)
+if get(g:, 'loaded_ctrlp_settings', 0)
     finish
 endif
 
@@ -58,4 +58,4 @@ command! -bar CtrlPRoot call ctrlp#init('fil', { 'mode': 'ra' })
 command! -nargs=? -complete=dir CtrlPAll call ctrlp_settings#ctrlp_all(<q-args>)
 command! -nargs=? -complete=dir CtrlPMRUCwdFiles call ctrlp_settings#mru_cwd_files(<q-args>)
 
-let g:loaded_ctrlp_settings_vim = 1
+let g:loaded_ctrlp_settings = 1
