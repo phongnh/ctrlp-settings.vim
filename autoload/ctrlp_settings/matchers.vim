@@ -12,6 +12,18 @@ function! ctrlp_settings#matchers#GetLinePrefixLen(ispath) abort
     return l:len
 endfunction
 
+" Reset all matcher caches - useful for manual cache clearing
+function! ctrlp_settings#matchers#reset_all() abort
+    try
+        call ctrlp_settings#matchers#matchfuzzy#reset()
+    catch
+    endtry
+    try
+        call ctrlp_settings#matchers#matchfuzzypos#reset()
+    catch
+    endtry
+endfunction
+
 function ctrlp_settings#matchers#Esc(str) abort
     return '\c' . substitute(tolower(a:str), '.', '\0[^\0]\\{-}', 'g')
 endfunction
@@ -19,52 +31,77 @@ endfunction
 function! ctrlp_settings#matchers#HighlightPositions(items, list_of_char_positions, line_prefix_len) abort
     let l:result = []
     let l:total_items = len(a:items)
-    for l:idx in range(len(a:list_of_char_positions))
+    
+    " Pre-calculate line numbers to avoid repeated arithmetic
+    let l:max_positions = len(a:list_of_char_positions)
+    
+    for l:idx in range(l:max_positions)
         let l:char_positions = a:list_of_char_positions[l:idx]
+        
+        " Skip empty position lists early
+        if empty(l:char_positions)
+            continue
+        endif
+        
         " TODO: Check CtrlP's position is bottom/top and its order is btt/ttb,
         "       to calculate line number to highlight
-        let l:linenr = l:total_items - (l:idx + 1) + 1
+        let l:linenr = l:total_items - l:idx
         let l:item = a:items[l:linenr - 1]
-        for l:position in s:ConvertCharPositions(l:char_positions)
+        
+        " Convert char positions to ranges once
+        let l:positions = s:ConvertCharPositions(l:char_positions)
+        
+        " Pre-allocate result size hint for better performance
+        for l:position in l:positions
             let l:byteidx = byteidx(l:item, l:position[0]) + 1
             if len(l:position) == 2
                 let l:bytecount = byteidx(l:item, l:position[0] + l:position[1]) + 1 - l:byteidx
                 call add(l:result, [l:linenr, a:line_prefix_len + l:byteidx, l:bytecount])
             else
                 call add(l:result, [l:linenr, a:line_prefix_len + l:byteidx])
-            end
+            endif
         endfor
     endfor
-    call matchaddpos('CtrlPMatch', l:result)
+    
+    " Single matchaddpos call is more efficient than multiple calls
+    if !empty(l:result)
+        call matchaddpos('CtrlPMatch', l:result)
+    endif
 endfunction
 
 "Copied and modified code from https://github.com/Donaldttt/fuzzyy/blob/3fa5c1ca430afb033e69d373af5e4c22d8107315/autoload/utils/selector.vim#L138
 function! s:ConvertCharPositions(char_positions) abort
     let l:result = []
+    let l:pos_count = len(a:char_positions)
+    
+    " Early return for empty or single position
+    if l:pos_count == 0
+        return l:result
+    elseif l:pos_count == 1
+        return [[a:char_positions[0]]]
+    endif
+    
     let l:start = a:char_positions[0]
     let l:end = l:start
     let l:len = 1
-    for l:idx in range(1, len(a:char_positions) - 1)
+    
+    for l:idx in range(1, l:pos_count - 1)
         let l:pos = a:char_positions[l:idx]
         if l:pos == (l:end + 1)
             let l:len += 1
+            let l:end = l:pos
         else
-            if l:len > 1
-                call add(l:result, [l:start, l:len])
-            else
-                call add(l:result, [l:start])
-            endif
+            " Add previous range
+            call add(l:result, l:len > 1 ? [l:start, l:len] : [l:start])
             let l:start = l:pos
-            let l:end = l:start
+            let l:end = l:pos
             let l:len = 1
         endif
-        let l:end = l:pos
     endfor
-    if l:len > 1
-        call add(l:result, [l:start, l:len])
-    else
-        call add(l:result, [l:start])
-    endif
+    
+    " Add final range
+    call add(l:result, l:len > 1 ? [l:start, l:len] : [l:start])
+    
     return l:result
 endfunction
 
@@ -77,6 +114,11 @@ function! ctrlp_settings#matchers#HighlightDefault(str) abort
     " get original characters so we can rebuild pat
     let l:chars = split(l:pat, '\[\^\\\?.\]\\{-}')
 
+    " Early return if no chars to highlight
+    if empty(l:chars)
+        return
+    endif
+
     " Build a pattern like /a.*b.*c/ from abc (but with .\{-} non-greedy
     " matchers instead)
     let l:pat = join(l:chars, '.\{-}')
@@ -85,7 +127,8 @@ function! ctrlp_settings#matchers#HighlightDefault(str) abort
     " Case sensitive?
     let l:beginning = (l:smartcase == '' ? '\c' : '\C') .. '^.*'
 
-    for l:i in range(len(l:chars))
+    let l:char_count = len(l:chars)
+    for l:i in range(l:char_count)
         " Surround our current target letter with \zs and \ze so it only
         " actually matches that one letter, but has all preceding and trailing
         " letters as well.

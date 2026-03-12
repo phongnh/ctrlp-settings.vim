@@ -58,4 +58,11 @@ command! -bar CtrlPRoot call ctrlp#init('fil', { 'mode': 'ra' })
 command! -nargs=? -complete=dir CtrlPAll call ctrlp_settings#ctrlp_all(<q-args>)
 command! -nargs=? -complete=dir CtrlPMRUCwdFiles call ctrlp_settings#mru_cwd_files(<q-args>)
 
+" Optional: Set up autocommands for manual cache clearing
+" Uncomment if you want to force cache reset on every CtrlP buffer entry
+" augroup ctrlp_settings_reset
+"     autocmd!
+"     autocmd BufEnter ControlP call ctrlp_settings#matchers#reset_all()
+" augroup END
+
 let g:loaded_ctrlp_settings = 1
