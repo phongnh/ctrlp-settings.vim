@@ -72,36 +72,36 @@ endfunction
 function! ctrlp_settings#matchers#HighlightDefault(str) abort
     let l:smartcase = &smartcase && a:str =~ '\u' ? '\C' : ''
 
-    let pat = s:SplitPattern(a:str)
+    let l:pat = s:SplitPattern(a:str)
 
     " get original characters so we can rebuild pat
-    let chars = split(pat, '\[\^\\\?.\]\\{-}')
+    let l:chars = split(l:pat, '\[\^\\\?.\]\\{-}')
 
     " Build a pattern like /a.*b.*c/ from abc (but with .\{-} non-greedy
     " matchers instead)
-    let pat = join(chars, '.\{-}')
+    let l:pat = join(l:chars, '.\{-}')
     " Ensure we match the last version of our pattern
-    let ending = '\(.*'.pat.'\)\@!'
+    let l:ending = '\(.*' .. l:pat .. '\)\@!'
     " Case sensitive?
-    let beginning = (l:smartcase == '' ? '\c' : '\C') . '^.*'
+    let l:beginning = (l:smartcase == '' ? '\c' : '\C') .. '^.*'
 
-    for i in range(len(chars))
+    for l:i in range(len(l:chars))
         " Surround our current target letter with \zs and \ze so it only
         " actually matches that one letter, but has all preceding and trailing
         " letters as well.
         " \zsa.*b.*c
         " a\(\zsb\|.*\zsb)\ze.*c
-        let charcopy = copy(l:chars)
-        if i == 0
-            let charcopy[i] = '\zs'.charcopy[i].'\ze'
-            let middle = join(charcopy, '.\{-}')
+        let l:charcopy = copy(l:chars)
+        if l:i == 0
+            let l:charcopy[l:i] = '\zs' .. l:charcopy[l:i] .. '\ze'
+            let l:middle = join(l:charcopy, '.\{-}')
         else
-            let before = join(charcopy[0:i-1], '.\{-}')
-            let after = join(charcopy[i+1:-1], '.\{-}')
-            let c = charcopy[i]
+            let l:before = join(l:charcopy[0:l:i-1], '.\{-}')
+            let l:after = join(l:charcopy[l:i+1:-1], '.\{-}')
+            let l:c = l:charcopy[l:i]
             " for abc, match either ab.\{-}c or a.*b.\{-}c in that order
-            let cpat = '\(\zs'.c.'\|'.'.*\zs'.c.'\)\ze.*'
-            let middle = before.cpat.after
+            let l:cpat = '\(\zs' .. l:c .. '\|' .. '.*\zs' .. l:c .. '\)\ze.*'
+            let l:middle = l:before .. l:cpat .. l:after
         endif
 
         " Now we matchadd for each letter, the basic form being:
@@ -109,38 +109,38 @@ function! ctrlp_settings#matchers#HighlightDefault(str) abort
         " and a negative lookahead ensuring that we only highlight the last
         " occurrence of our letters. We also ensure that our matcher is case
         " insensitive or sensitive depending.
-        call matchadd('CtrlPMatch', beginning.middle.ending)
+        call matchadd('CtrlPMatch', l:beginning .. l:middle .. l:ending)
     endfor
 endfunction
 
 " Copied and modified from https://github.com/ctrlpvim/ctrlp.vim/blob/7c972cb19c8544c681ca345c64ec39e04f4651cc/autoload/ctrlp.vim#L701
 function! s:SplitPattern(str) abort
-    let lst = split(a:str, '\zs')
+    let l:lst = split(a:str, '\zs')
     if exists('+shellslash') && !&shellslash
-        cal map(lst, 'escape(v:val, ''\'')')
+        cal map(l:lst, 'escape(v:val, ''\'')')
     endif
-    for each in ['^', '$', '.']
-        cal map(lst, 'escape(v:val, each)')
+    for l:each in ['^', '$', '.']
+        cal map(l:lst, 'escape(v:val, l:each)')
     endfor
-    let pat = ''
-    if !empty(lst)
-        let pat = s:BuildPattern(lst)
+    let l:pat = ''
+    if !empty(l:lst)
+        let l:pat = s:BuildPattern(l:lst)
     endif
-    return escape(pat, '~')
+    return escape(l:pat, '~')
 endfunction
 
 " Copied and modified from https://github.com/ctrlpvim/ctrlp.vim/blob/7c972cb19c8544c681ca345c64ec39e04f4651cc/autoload/ctrlp.vim#L2597
 function! s:BuildPattern(lst) abort
-    let pat = a:lst[0]
+    let l:pat = a:lst[0]
     if get(g:, 'ctrlp_match_natural_name', 0) == 1
-        for item in range(1, len(a:lst) - 1)
-            let c = a:lst[item - 1]
-            let pat .= (c == '/' ? '[^/]\{-}' : '[^'.c.'/]\{-}').a:lst[item]
+        for l:item in range(1, len(a:lst) - 1)
+            let l:c = a:lst[l:item - 1]
+            let l:pat ..= (l:c == '/' ? '[^/]\{-}' : '[^' .. l:c .. '/]\{-}') .. a:lst[l:item]
         endfor
     else
-        for item in range(1, len(a:lst) - 1)
-            let pat .= '[^'.a:lst[item - 1].']\{-}'.a:lst[item]
+        for l:item in range(1, len(a:lst) - 1)
+            let l:pat ..= '[^' .. a:lst[l:item - 1] .. ']\{-}' .. a:lst[l:item]
         endfor
     endif
-    return pat
+    return l:pat
 endfunction

@@ -35,7 +35,7 @@ function! ctrlp_settings#matchers#matchfuzzypos#match(items, str, limit, mmode, 
     if a:regex
         let s:timer = timer_start(
                     \ 10,
-                    \ { t -> [clearmatches(), matchadd('CtrlPMatch', a:str), hlexists('CtrlPLinePre') ? matchadd('CtrlPLinePre', '^>') : '', execute('redraw')] },
+                    \ { l:t -> [clearmatches(), matchadd('CtrlPMatch', a:str), hlexists('CtrlPLinePre') ? matchadd('CtrlPLinePre', '^>') : '', execute('redraw')] },
                     \ { 'repeat': 0 }
                     \ )
         return filter(copy(a:items), 'v:val =~ a:str')
@@ -44,18 +44,18 @@ function! ctrlp_settings#matchers#matchfuzzypos#match(items, str, limit, mmode, 
     if ctrlp#call('s:curtype') ==# 'buf'
         let s:timer = timer_start(
                     \ 10,
-                    \ { t -> [clearmatches(), ctrlp_settings#matchers#HighlightDefault(a:str), hlexists('CtrlPLinePre') ? matchadd('CtrlPLinePre', '^>') : '', execute('redraw')] },
+                    \ { l:t -> [clearmatches(), ctrlp_settings#matchers#HighlightDefault(a:str), hlexists('CtrlPLinePre') ? matchadd('CtrlPLinePre', '^>') : '', execute('redraw')] },
                     \ { 'repeat': 0 }
                     \ )
         return matchfuzzy(a:items, a:str, { 'limit': a:limit })
     endif
 
-    let [l:items, l:list_of_char_positions, _] = matchfuzzypos(a:items, a:str, { 'limit': a:limit })
+    let [l:items, l:list_of_char_positions, l:_] = matchfuzzypos(a:items, a:str, { 'limit': a:limit })
 
     let l:line_prefix_len = ctrlp_settings#matchers#GetLinePrefixLen(a:ispath)
     let s:timer = timer_start(
                 \ 10,
-                \ { t -> [clearmatches(), ctrlp_settings#matchers#HighlightPositions(l:items, l:list_of_char_positions, l:line_prefix_len), hlexists('CtrlPLinePre') ? matchadd('CtrlPLinePre', '^>') : '', execute('redraw')] },
+                \ { l:t -> [clearmatches(), ctrlp_settings#matchers#HighlightPositions(l:items, l:list_of_char_positions, l:line_prefix_len), hlexists('CtrlPLinePre') ? matchadd('CtrlPLinePre', '^>') : '', execute('redraw')] },
                 \ { 'repeat': 0 }
                 \ )
     return l:items
