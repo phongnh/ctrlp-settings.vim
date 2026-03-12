@@ -12,18 +12,6 @@ function! ctrlp_settings#matchers#GetLinePrefixLen(ispath) abort
     return l:len
 endfunction
 
-" Reset all matcher caches - useful for manual cache clearing
-function! ctrlp_settings#matchers#reset_all() abort
-    try
-        call ctrlp_settings#matchers#matchfuzzy#reset()
-    catch
-    endtry
-    try
-        call ctrlp_settings#matchers#matchfuzzypos#reset()
-    catch
-    endtry
-endfunction
-
 function ctrlp_settings#matchers#Esc(str) abort
     return '\c' . substitute(tolower(a:str), '.', '\0[^\0]\\{-}', 'g')
 endfunction
