@@ -28,7 +28,7 @@ let s:last_pattern = ''
 let s:is_buf_mode = -1
 let s:last_mode = ''
 
-function! ctrlp_settings#matchers#matchfuzzy#match(items, str, limit, mmode, ispath, crfile, regex) abort
+function! ctrlp_settings#matchers#matchfuzzy#match(items, str, limit, _mmode, _ispath, _crfile, regex) abort
     " Detect mode changes and reset cache automatically
     let l:current_mode = ctrlp#call('s:curtype')
     if s:last_mode !=# l:current_mode
