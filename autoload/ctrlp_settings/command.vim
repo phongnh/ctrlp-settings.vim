@@ -14,11 +14,9 @@ function! s:BuildFindCommand() abort
     if executable('fd')
         let g:ctrlp_find_command = 'fd --base-directory %s --type file --color never --hidden'
         let g:ctrlp_find_command ..= (g:ctrlp_follow_symlinks ? ' --follow' : '')
-        let g:ctrlp_find_command ..= (g:ctrlp_find_no_ignore_vcs ? ' --no-ignore-vcs' : '')
     elseif executable('rg')
         let g:ctrlp_find_command = 'rg %s --files --color never --ignore-dot --ignore-parent --hidden'
         let g:ctrlp_find_command ..= (g:ctrlp_follow_symlinks ? ' --follow' : '')
-        let g:ctrlp_find_command ..= (g:ctrlp_find_no_ignore_vcs ? ' --no-ignore-vcs' : '')
     endif
 endfunction
 
